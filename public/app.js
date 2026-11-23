@@ -750,6 +750,22 @@ function switchTab(tabId) {
   else if (tabId === 'settings') loadSettings();
 }
 
+function openKarigarList() {
+  // Switch to karigars tab then show the list sub-tab
+  switchTab('karigars');
+  setTimeout(() => {
+    const listBtn = document.querySelector('.btn-sm.btn-outline[onclick*="\'list\'"]');
+    switchKarigarSubTab('list', listBtn);
+    if (listBtn) {
+      // Update active button styling
+      if (listBtn.parentElement) {
+        listBtn.parentElement.querySelectorAll('.btn').forEach(b => b.classList.remove('active-filter'));
+        listBtn.classList.add('active-filter');
+      }
+    }
+  }, 200);
+}
+
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   const backdrop = document.getElementById('sidebarBackdrop');

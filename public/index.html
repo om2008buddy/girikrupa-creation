@@ -114,6 +114,10 @@
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           ફિક્સ પગાર સ્ટાફ
         </a>
+        <a class="nav-item" onclick="openKarigarList()">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+          કારીગર લિસ્ટ
+        </a>
 
         <div class="nav-section-title">સિસ્ટમ</div>
         <a class="nav-item" onclick="switchTab('settings')">
@@ -358,7 +362,6 @@
               <button class="btn btn-sm btn-outline active-filter" onclick="switchKarigarSubTab('ledger', this)">કારીગર ખાતાવહી & રસીદ</button>
               <button class="btn btn-sm btn-outline" onclick="switchKarigarSubTab('work', this)">કામ એન્ટ્રી (કુર્તી/પેન્ટ)</button>
               <button class="btn btn-sm btn-outline" onclick="switchKarigarSubTab('upad', this)">ઉપાડ હિસાબ (Advance)</button>
-              <button class="btn btn-sm btn-outline" onclick="switchKarigarSubTab('list', this)">કારીગર લિસ્ટ</button>
             </div>
             <div style="display: flex; gap: 8px;">
               <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-karigar-work')">+ કામ એન્ટ્રી ઉમેરો</button>
@@ -595,7 +598,7 @@
         <section id="view-expenses" class="tab-view" style="display: none;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
             <button class="btn btn-danger" onclick="openModal('modal-add-expense')">+ ખાતા ખર્ચ નોંધો</button>
-            <p style="font-size: 13px; color: var(--slate-500);">લાઈટ બિલ, કચરો વાળવા વાળો, કારખાના ભાડું, પાણી બિલ, ચા-નાસ્તો</p>
+            <p style="font-size: 13px; color: var(--slate-500);">લાઈટ બિલ, સફાઈ કર્મચારી, કારખાના ભાડું, પાણી બિલ, ચા-નાસ્તો</p>
           </div>
 
           <div class="premium-card">
@@ -1237,7 +1240,7 @@
               <label>ખર્ચ કેટેગરી પસંદ કરો:</label>
               <select id="expCategory" class="form-control" required>
                 <option value="લાઈટ બિલ">લાઈટ બિલ (Electricity Bill)</option>
-                <option value="કચરો વાળવા વાળો">કચરો વાળવા વાળો (Cleaning & Waste)</option>
+                <option value="સફાઈ કર્મચારી">સફાઈ કર્મચારી (Safai Karmachari)</option>
                 <option value="કારખાના ભાડું">કારખાના ભાડું (Factory Rent)</option>
                 <option value="પાણી બિલ / કેન">પાણી બિલ / કેન (Drinking & Factory Water)</option>
                 <option value="ચા-નાસ્તો">ચા-નાસ્તો (Tea & Refreshments)</option>
