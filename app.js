@@ -736,7 +736,7 @@ function switchTab(tabId) {
     document.getElementById('pageSubtitle').textContent = viewTitles[tabId].sub;
   }
 
-  document.getElementById('sidebar').classList.remove('open');
+  closeSidebar();
 
   if (tabId === 'dashboard') loadDashboard();
   else if (tabId === 'lots') loadLots();
@@ -751,7 +751,24 @@ function switchTab(tabId) {
 }
 
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
+  const sb = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  if (!sb) return;
+  const isOpen = sb.classList.toggle('open');
+  if (backdrop) {
+    if (isOpen) {
+      backdrop.classList.add('active');
+    } else {
+      backdrop.classList.remove('active');
+    }
+  }
+}
+
+function closeSidebar() {
+  const sb = document.getElementById('sidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  if (sb) sb.classList.remove('open');
+  if (backdrop) backdrop.classList.remove('active');
 }
 
 function switchKarigarSubTab(subId, btn) {
@@ -768,10 +785,15 @@ function switchKarigarSubTab(subId, btn) {
 // TOAST NOTIFICATIONS & MODALS
 // ===================================================================
 function showToast(message, type = 'info') {
+  let displayMsg = message;
+  if (typeof message === 'string' && (message.includes('Unexpected token') || message.includes('<!DOCTYPE') || message.includes('JSON'))) {
+    displayMsg = 'કનેક્શન ફરીથી જોડાઈ રહ્યું છે... ડેટા રિફ્રેશ થઈ રહ્યો છે.';
+  }
   const container = document.getElementById('toastContainer');
+  if (!container) return;
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
-  toast.textContent = message;
+  toast.textContent = displayMsg;
   container.appendChild(toast);
   setTimeout(() => {
     toast.remove();

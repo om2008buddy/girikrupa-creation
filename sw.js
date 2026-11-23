@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gurukrupa-cache-v1';
+const CACHE_NAME = 'gurukrupa-cache-v5';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -11,7 +11,7 @@ const STATIC_ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
+      return cache.addAll(STATIC_ASSETS).catch(() => {});
     })
   );
   self.skipWaiting();
@@ -33,8 +33,14 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Pass API requests straight to network
-  if (event.request.url.includes('/api/')) {
+  const url = event.request.url;
+
+  // Always bypass cache for Supabase API calls and any /api/ routes
+  if (
+    url.includes('supabase.co') ||
+    url.includes('/api/') ||
+    url.includes('supabase.io')
+  ) {
     event.respondWith(fetch(event.request));
     return;
   }
@@ -43,7 +49,7 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (response && response.status === 200) {
+        if (response && response.status === 200 && response.type !== 'opaque') {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseToCache);

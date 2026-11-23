@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles.css?v=2.5">
 </head>
 <body>
 
@@ -131,6 +131,9 @@
       </div>
     </aside>
 
+    <!-- Mobile Sidebar Blur Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
     <!-- Main Wrapper -->
     <div class="main-wrapper">
       
@@ -146,16 +149,7 @@
           </div>
         </div>
 
-        <div class="topbar-right">
-          <div class="live-badge">
-            <div class="live-dot"></div>
-            <span>સિસ્ટમ ચાલુ છે</span>
-          </div>
-          <div class="net-ip-pill" id="ipDisplay" title="આ એડ્રેસથી મોબાઈલમાં પણ ચાલશે">
-            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
-            <span id="serverIpText">Loading IP...</span>
-          </div>
-        </div>
+        <div class="topbar-right"></div>
       </header>
 
       <!-- Content Views -->
@@ -1472,13 +1466,15 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- Application Logic -->
-  <script src="./app.js"></script>
+  <script src="./app.js?v=2.5"></script>
 
   <!-- PWA Registration -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration error:', err));
+        navigator.serviceWorker.register('./sw.js?v=2.5').then(reg => {
+          reg.update();
+        }).catch(err => console.log('SW registration error:', err));
       });
     }
   </script>
