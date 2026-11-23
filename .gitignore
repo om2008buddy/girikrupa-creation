@@ -1,0 +1,6 @@
+gurukrupa.db
+gurukrupa.db-shm
+gurukrupa.db-wal
+.DS_Store
+node_modules/
+*.log

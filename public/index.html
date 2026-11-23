@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ગુરુકૃપા ક્રિએશન | Gurukrupa Creation</title>
+  
+  <!-- Favicon & PWA -->
+  <link rel="icon" type="image/png" href="./logo.png">
+  <link rel="apple-touch-icon" href="./logo.png">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+  <!-- Animated Ambient Mesh Background -->
+  <div class="ambient-bg"></div>
+
+  <!-- ===================================================================
+       PASSCODE GATE MODAL (PIN: 6390)
+       =================================================================== -->
+  <div id="lockScreen" class="lock-screen-wrapper">
+    <div class="lock-card" id="lockCard">
+      <div class="lock-logo">
+        <img src="./logo.png" alt="Gurukrupa Logo">
+      </div>
+      <h2 class="lock-title">ગુરુકૃપા ક્રિએશન</h2>
+      <p class="lock-sub">એપ શરૂ કરવા માટે પાસકોડ દાખલ કરો</p>
+
+      <div class="pin-dots" id="pinDots">
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+        <div class="pin-dot"></div>
+      </div>
+
+      <div class="numpad-grid">
+        <button class="num-btn" onclick="enterPin('1')">1</button>
+        <button class="num-btn" onclick="enterPin('2')">2</button>
+        <button class="num-btn" onclick="enterPin('3')">3</button>
+        <button class="num-btn" onclick="enterPin('4')">4</button>
+        <button class="num-btn" onclick="enterPin('5')">5</button>
+        <button class="num-btn" onclick="enterPin('6')">6</button>
+        <button class="num-btn" onclick="enterPin('7')">7</button>
+        <button class="num-btn" onclick="enterPin('8')">8</button>
+        <button class="num-btn" onclick="enterPin('9')">9</button>
+        <button class="num-btn action" onclick="clearPin()">C</button>
+        <button class="num-btn" onclick="enterPin('0')">0</button>
+        <button class="num-btn action" onclick="deletePin()">⌫</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MAIN APPLICATION LAYOUT
+       =================================================================== -->
+  <div class="app-container" id="appRoot" style="display: none;">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo-wrap">
+          <img src="./logo.png" alt="Logo" class="brand-logo-img">
+        </div>
+        <div class="brand-info">
+          <h1>ગુરુકૃપા ક્રિએશન</h1>
+          <p>Gurukrupa Creation</p>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-section-title">મુખ્ય મેનૂ</div>
+        <a class="nav-item active" onclick="switchTab('dashboard')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          ડેશબોર્ડ & નફો
+        </a>
+        <a class="nav-item" onclick="switchTab('lots')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+          વેપારી આવેલ માલ
+        </a>
+        <a class="nav-item" onclick="switchTab('challans')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          વેપારી માલ ચલણ
+        </a>
+
+        <div class="nav-section-title">કારીગર & ઉત્પાદન</div>
+        <a class="nav-item" onclick="switchTab('karigars')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          કારીગર કામ & ઉપાડ
+        </a>
+        <a class="nav-item" onclick="switchTab('designs')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+          ડિઝાઇન કેટલોગ
+        </a>
+        <a class="nav-item" onclick="switchTab('press')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          પ્રેસ હિસાબ
+        </a>
+
+        <div class="nav-section-title">ખર્ચ & સ્ટાફ</div>
+        <a class="nav-item" onclick="switchTab('materials')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+          મટીરીયલ્સ ખર્ચ
+        </a>
+        <a class="nav-item" onclick="switchTab('expenses')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          ખાતા ખર્ચ (ભાડું/લાઈટ/પાણી)
+        </a>
+        <a class="nav-item" onclick="switchTab('staff')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          ફિક્સ પગાર સ્ટાફ
+        </a>
+
+        <div class="nav-section-title">સિસ્ટમ</div>
+        <a class="nav-item" onclick="switchTab('settings')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          સેટિંગ્સ & બેકઅપ
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="lock-btn" onclick="lockApp()">
+          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          લોક કરો
+        </button>
+        <span style="font-size: 11px; color: var(--slate-500);">v1.0 • GK</span>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" onclick="toggleSidebar()">
+            <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div class="page-title-wrap">
+            <h2 id="pageTitle">નફો-નુકસાન અને ડેશબોર્ડ</h2>
+            <p id="pageSubtitle">સમગ્ર કારખાનાનો હિસાબ અને વાસ્તવિક ચોખ્ખો નફો</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="live-badge">
+            <div class="live-dot"></div>
+            <span>સિસ્ટમ ચાલુ છે</span>
+          </div>
+          <div class="net-ip-pill" id="ipDisplay" title="આ એડ્રેસથી મોબાઈલમાં પણ ચાલશે">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            <span id="serverIpText">Loading IP...</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Views -->
+      <main class="content-body">
+        
+        <!-- ==========================================
+             VIEW 1: DASHBOARD & PNL (નફો-નુકસાન હિસાબ)
+             ========================================== -->
+        <section id="view-dashboard" class="tab-view">
+          
+          <!-- Date Filter Header -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn btn-sm btn-outline active-filter" onclick="filterDashboard('all', this)">બધો સમય (All)</button>
+              <button class="btn btn-sm btn-outline" onclick="filterDashboard('month', this)">આ મહિને</button>
+              <button class="btn btn-sm btn-outline" onclick="filterDashboard('week', this)">આ અઠવાડિયે</button>
+              <button class="btn btn-sm btn-outline" onclick="filterDashboard('today', this)">આજે</button>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-primary" onclick="openModal('modal-add-lot')">+ નવો માલ ઉમેરો</button>
+              <button class="btn btn-success" onclick="openModal('modal-add-challan')">+ ચલણ બનાવો</button>
+            </div>
+          </div>
+
+          <!-- Financial Statistics Grid (Point 8) -->
+          <div class="stats-grid">
+            <div class="stat-card revenue">
+              <div class="stat-meta">
+                <p>કુલ આવક (વેપારી માલ)</p>
+                <h3 id="statRevenue">₹0</h3>
+                <span class="sub-info" id="statPieces">0 પીસ • 0 લોટ</span>
+              </div>
+              <div class="stat-icon">
+                <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+            </div>
+
+            <div class="stat-card stitching">
+              <div class="stat-meta">
+                <p>કારીગર સિલાઈ ખર્ચ</p>
+                <h3 id="statStitching">₹0</h3>
+                <span class="sub-info" id="statKurtiPantPcs">કુર્તી: 0 • પેન્ટ: 0</span>
+              </div>
+              <div class="stat-icon">
+                <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879a3 3 0 11-4.242-4.242L10.5 7.5"/></svg>
+              </div>
+            </div>
+
+            <div class="stat-card press">
+              <div class="stat-meta">
+                <p>પ્રેસ ખર્ચ</p>
+                <h3 id="statPress">₹0</h3>
+                <span class="sub-info" id="statPressPcs">0 પીસ પ્રેસ થયા</span>
+              </div>
+              <div class="stat-icon">
+                <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+              </div>
+            </div>
+
+            <div class="stat-card materials">
+              <div class="stat-meta">
+                <p>મટીરીયલ્સ / કાચો માલ</p>
+                <h3 id="statMaterials">₹0</h3>
+                <span class="sub-info">દોરો, બટન, ઝિપ, પેકિંગ</span>
+              </div>
+              <div class="stat-icon">
+                <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+              </div>
+            </div>
+
+            <div class="stat-card overheads">
+              <div class="stat-meta">
+                <p>ખાતા ખર્ચ (ભાડું/લાઈટ/પાણી)</p>
+                <h3 id="statOverheads">₹0</h3>
+                <span class="sub-info" id="statStaffSalary">સ્ટાફ પગાર: ₹0</span>
+              </div>
+              <div class="stat-icon">
+                <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              </div>
+            </div>
+
+            <div class="stat-card profit">
+              <div class="stat-meta">
+                <p>ચોખ્ખો નફો (NET PROFIT)</p>
+                <h3 id="statNetProfit" style="color: var(--emerald-600);">₹0</h3>
+                <span class="sub-info" id="statProfitMargin" style="font-weight: 700; color: var(--emerald-700);">નફો: 0%</span>
+              </div>
+              <div class="stat-icon">
+                <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Inward Lots Overview -->
+          <div class="premium-card" style="margin-top: 24px;">
+            <div class="card-header">
+              <h3>
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                હાલમાં આવેલ માલ (Recent Lots)
+              </h3>
+              <button class="btn btn-sm btn-outline" onclick="switchTab('lots')">બધા જુઓ →</button>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-container" style="border: none;">
+                <table id="dashboardLotsTable">
+                  <thead>
+                    <tr>
+                      <th>તારીખ</th>
+                      <th>લોટ નં.</th>
+                      <th>વેપારી નામ</th>
+                      <th>ડિઝાઇન</th>
+                      <th>પીસ</th>
+                      <th>ભાવ (₹)</th>
+                      <th>કુલ રકમ</th>
+                      <th>સ્થિતિ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Empty State will be rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==========================================
+             VIEW 2: INWARD LOTS & MERCHANTS (વેપારી માલ)
+             ========================================== -->
+        <section id="view-lots" class="tab-view" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-primary" onclick="openModal('modal-add-lot')">+ નવો માલ એન્ટ્રી</button>
+              <button class="btn btn-outline" onclick="openModal('modal-add-merchant')">+ નવો વેપારી ઉમેરો</button>
+            </div>
+            <input type="text" class="form-control" placeholder="વેપારી અથવા ડિઝાઇન શોધો..." oninput="filterLots(this.value)" style="max-width: 260px;">
+          </div>
+
+          <div class="premium-card">
+            <div class="card-body" style="padding: 0;">
+              <div class="table-container" style="border: none;">
+                <table id="lotsTable">
+                  <thead>
+                    <tr>
+                      <th>તારીખ</th>
+                      <th>લોટ નં.</th>
+                      <th>વેપારી નામ</th>
+                      <th>ડિઝાઇન નંબર</th>
+                      <th>કુલ પીસ</th>
+                      <th>વેપારી ભાવ</th>
+                      <th>કુલ રકમ (₹)</th>
+                      <th>સ્થિતિ</th>
+                      <th>એક્શન</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 3: DELIVERY CHALLANS (વેપારી માલ ચલણ)
+             ========================================== -->
+        <section id="view-challans" class="tab-view" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <div>
+              <button class="btn btn-success" onclick="openModal('modal-add-challan')">+ નવું માલ ચલણ બનાવો</button>
+            </div>
+            <p style="font-size: 13px; color: var(--slate-500);">વેપારીને તૈયાર માલ જમા કરાવતી વખતે ચલણ નીકળી જશે</p>
+          </div>
+
+          <div class="premium-card">
+            <div class="card-body" style="padding: 0;">
+              <div class="table-container" style="border: none;">
+                <table id="challansTable">
+                  <thead>
+                    <tr>
+                      <th>તારીખ</th>
+                      <th>ચલણ નંબર</th>
+                      <th>વેપારી નામ</th>
+                      <th>ડિઝાઇન વિગત</th>
+                      <th>કુલ પીસ</th>
+                      <th>કુલ રકમ (₹)</th>
+                      <th>સ્થિતિ</th>
+                      <th>પ્રિન્ટ / એક્શન</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 4: KARIGARS (કારીગર કામ & ઉપાડ હિસાબ)
+             ========================================== -->
+        <section id="view-karigars" class="tab-view" style="display: none;">
+          
+          <!-- Sub-navigation tabs -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-sm btn-outline active-filter" onclick="switchKarigarSubTab('ledger', this)">કારીગર ખાતાવહી & રસીદ</button>
+              <button class="btn btn-sm btn-outline" onclick="switchKarigarSubTab('work', this)">કામ એન્ટ્રી (કુર્તી/પેન્ટ)</button>
+              <button class="btn btn-sm btn-outline" onclick="switchKarigarSubTab('upad', this)">ઉપાડ હિસાબ (Advance)</button>
+              <button class="btn btn-sm btn-outline" onclick="switchKarigarSubTab('list', this)">કારીગર લિસ્ટ</button>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-karigar-work')">+ કામ એન્ટ્રી ઉમેરો</button>
+              <button class="btn btn-danger btn-sm" onclick="openModal('modal-add-upad')">+ ઉપાડ આપો</button>
+            </div>
+          </div>
+
+          <!-- Subtab 1: Ledger & Salary Slip -->
+          <div id="karigar-sub-ledger">
+            <div class="premium-card" style="margin-bottom: 20px;">
+              <div class="card-body">
+                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                  <div class="form-group" style="min-width: 250px;">
+                    <label>કારીગર પસંદ કરો:</label>
+                    <select id="ledgerKarigarSelect" class="form-control" onchange="loadKarigarLedger(this.value)">
+                      <option value="">-- કારીગર સિલેક્ટ કરો --</option>
+                    </select>
+                  </div>
+                  <div id="karigarLedgerSummary" style="display: none; align-items: center; gap: 20px; margin-top: 18px; flex-wrap: wrap;">
+                    <div>કુલ કામ: <strong id="ledTotalWork" style="color: var(--sapphire-600); font-size: 16px;">₹0</strong></div>
+                    <div>કુલ ઉપાડ: <strong id="ledTotalUpad" style="color: var(--rose-600); font-size: 16px;">₹0</strong></div>
+                    <div>બાકી ચૂકવવાના: <strong id="ledNetBalance" style="color: var(--emerald-600); font-size: 18px;">₹0</strong></div>
+                    <button class="btn btn-success btn-sm" onclick="printKarigarSalarySlip()">
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                      કારીગર પગાર રસીદ પ્રિન્ટ કરો
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="premium-card">
+              <div class="card-header">
+                <h3>કારીગર કામ & ઉપાડ સ્ટેટમેન્ટ</h3>
+              </div>
+              <div class="card-body" style="padding: 0;">
+                <div class="table-container" style="border: none;">
+                  <table id="karigarLedgerTable">
+                    <thead>
+                      <tr>
+                        <th>તારીખ</th>
+                        <th>પ્રકાર</th>
+                        <th>ડિઝાઇન / નોંધ</th>
+                        <th>કુર્તી પીસ</th>
+                        <th>પેન્ટ પીસ</th>
+                        <th>રકમ (₹)</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subtab 2: Work Log -->
+          <div id="karigar-sub-work" style="display: none;">
+            <div class="premium-card">
+              <div class="card-body" style="padding: 0;">
+                <div class="table-container" style="border: none;">
+                  <table id="karigarWorkTable">
+                    <thead>
+                      <tr>
+                        <th>તારીખ</th>
+                        <th>કારીગર નામ</th>
+                        <th>ડિઝાઇન</th>
+                        <th>કુર્તી પીસ × ભાવ</th>
+                        <th>પેન્ટ પીસ × ભાવ</th>
+                        <th>અન્ય કામ</th>
+                        <th>કુલ રકમ</th>
+                        <th>એક્શન</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subtab 3: Upad Log -->
+          <div id="karigar-sub-upad" style="display: none;">
+            <div class="premium-card">
+              <div class="card-body" style="padding: 0;">
+                <div class="table-container" style="border: none;">
+                  <table id="karigarUpadTable">
+                    <thead>
+                      <tr>
+                        <th>તારીખ</th>
+                        <th>કારીગર નામ</th>
+                        <th>ઉપાડ રકમ (₹)</th>
+                        <th>પેમેન્ટ મોડ</th>
+                        <th>નોંધ</th>
+                        <th>એક્શન</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subtab 4: Karigar Master List -->
+          <div id="karigar-sub-list" style="display: none;">
+            <div style="margin-bottom: 14px;">
+              <button class="btn btn-primary btn-sm" onclick="openModal('modal-add-karigar')">+ નવો કારીગર ઉમેરો</button>
+            </div>
+            <div class="premium-card">
+              <div class="card-body" style="padding: 0;">
+                <div class="table-container" style="border: none;">
+                  <table id="karigarsListTable">
+                    <thead>
+                      <tr>
+                        <th>કારીગર નામ</th>
+                        <th>મોબાઇલ નંબર</th>
+                        <th>કામનો પ્રકાર</th>
+                        <th>સરનામું</th>
+                        <th>એક્શન</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ==========================================
+             VIEW 5: DESIGNS MASTER (ડિઝાઇન કેટલોગ)
+             ========================================== -->
+        <section id="view-designs" class="tab-view" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <button class="btn btn-primary" onclick="openModal('modal-add-design')">+ નવી ડિઝાઇન ઉમેરો</button>
+            <p style="font-size: 13px; color: var(--slate-500);">ડિઝાઇન મુજબ વેપારી ભાવ, કારીગર કુર્તી/પેન્ટ ભાવ અને પ્રેસ ભાવ સેટ કરો</p>
+          </div>
+
+          <div class="premium-card">
+            <div class="card-body" style="padding: 0;">
+              <div class="table-container" style="border: none;">
+                <table id="designsTable">
+                  <thead>
+                    <tr>
+                      <th>ડિઝાઇન નં.</th>
+                      <th>નામ / વર્ણન</th>
+                      <th>વેપારી ભાવ (₹)</th>
+                      <th>કારીગર કુર્તી ભાવ</th>
+                      <th>કારીગર પેન્ટ ભાવ</th>
+                      <th>પ્રેસ ભાવ</th>
+                      <th>મટીરીયલ અંદાજ</th>
+                      <th>નફો/પીસ</th>
+                      <th>એક્શન</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 6: PRESS VENDORS & ENTRIES (પ્રેસ હિસાબ)
+             ========================================== -->
+        <section id="view-press" class="tab-view" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-primary" onclick="openModal('modal-add-press-entry')">+ પ્રેસ કામ નોંધો</button>
+              <button class="btn btn-outline" onclick="openModal('modal-add-press-vendor')">+ પ્રેસ વાળા ઉમેરો</button>
+            </div>
+          </div>
+
+          <div class="premium-card">
+            <div class="card-body" style="padding: 0;">
+              <div class="table-container" style="border: none;">
+                <table id="pressTable">
+                  <thead>
+                    <tr>
+                      <th>તારીખ</th>
+                      <th>પ્રેસ વાળાનું નામ</th>
+                      <th>ડિઝાઇન</th>
+                      <th>પીસ</th>
+                      <th>ભાવ / પીસ</th>
+                      <th>કુલ બિલ (₹)</th>
+                      <th>સ્થિતિ</th>
+                      <th>એક્શન</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 7: RAW MATERIALS (મટીરીયલ્સ ખર્ચ)
+             ========================================== -->
+        <section id="view-materials" class="tab-view" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <button class="btn btn-primary" onclick="openModal('modal-add-material')">+ મટીરીયલ ખર્ચ નોંધો</button>
+            <p style="font-size: 13px; color: var(--slate-500);">દોરો, બટન, ઝિપ, ઇલાસ્ટિક, લેસ, પેકિંગ બેગ, હેંગર વગેરે</p>
+          </div>
+
+          <div class="premium-card">
+            <div class="card-body" style="padding: 0;">
+              <div class="table-container" style="border: none;">
+                <table id="materialsTable">
+                  <thead>
+                    <tr>
+                      <th>તારીખ</th>
+                      <th>મટીરીયલ નામ</th>
+                      <th>જથ્થો (Qty)</th>
+                      <th>એકમ (Unit)</th>
+                      <th>ભાવ (₹)</th>
+                      <th>કુલ રકમ</th>
+                      <th>વેપારી / દુકાન</th>
+                      <th>બિલ નં.</th>
+                      <th>એક્શન</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 8: FACTORY EXPENSES (કારખાના ખાતા ખર્ચ)
+             ========================================== -->
+        <section id="view-expenses" class="tab-view" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <button class="btn btn-danger" onclick="openModal('modal-add-expense')">+ ખાતા ખર્ચ નોંધો</button>
+            <p style="font-size: 13px; color: var(--slate-500);">લાઈટ બિલ, કચરો વાળવા વાળો, કારખાના ભાડું, પાણી બિલ, ચા-નાસ્તો</p>
+          </div>
+
+          <div class="premium-card">
+            <div class="card-body" style="padding: 0;">
+              <div class="table-container" style="border: none;">
+                <table id="expensesTable">
+                  <thead>
+                    <tr>
+                      <th>તારીખ</th>
+                      <th>ખર્ચ કેટેગરી</th>
+                      <th>રકમ (₹)</th>
+                      <th>ચૂકવ્યા (Paid To)</th>
+                      <th>પેમેન્ટ મોડ</th>
+                      <th>નોંધ</th>
+                      <th>એક્શન</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 9: FIXED SALARY STAFF (ફિક્સ પગાર સ્ટાફ)
+             ========================================== -->
+        <section id="view-staff" class="tab-view" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-primary" onclick="openModal('modal-add-staff-attendance')">+ દૈનિક હાજરી & કલાક નોંધો</button>
+              <button class="btn btn-outline" onclick="openModal('modal-add-staff')">+ નવો સ્ટાફ ઉમેરો</button>
+            </div>
+            <p style="font-size: 13px; color: var(--slate-500);">કટિંગ માસ્ટર, પેકિંગ, હેલ્પરનો દિવસે કલાક સાથે હિસાબ</p>
+          </div>
+
+          <div class="premium-card">
+            <div class="card-body" style="padding: 0;">
+              <div class="table-container" style="border: none;">
+                <table id="staffAttendanceTable">
+                  <thead>
+                    <tr>
+                      <th>તારીખ</th>
+                      <th>કર્મચારી નામ</th>
+                      <th>રોલ</th>
+                      <th>સ્થિતિ</th>
+                      <th>કલાકો (Hours)</th>
+                      <th>ગણેલો પગાર (₹)</th>
+                      <th>ઉપાડ કપાત</th>
+                      <th>ચોખ્ખી રકમ</th>
+                      <th>એક્શન</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW 10: SETTINGS & BACKUP (સેટિંગ્સ & બેકઅપ)
+             ========================================== -->
+        <section id="view-settings" class="tab-view" style="display: none;">
+          <div style="max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px;">
+            
+            <!-- Android / Mobile Connect Guide -->
+            <div class="premium-card">
+              <div class="card-header">
+                <h3>
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                  Android મોબાઇલમાં એપ ખોલો (Shared Live Data)
+                </h3>
+              </div>
+              <div class="card-body">
+                <p style="font-size: 13.5px; margin-bottom: 12px; color: var(--slate-700);">
+                  તમારો મોબાઈલ આ જ વાઇફાઇ (Wi-Fi) સાથે કનેક્ટ કરો અને નીચે આપેલ લિંક તમારા ફોનના ક્રોમ બ્રાઉઝરમાં ખોલો:
+                </p>
+                <div style="background: var(--slate-100); padding: 12px 16px; border-radius: var(--radius-md); font-size: 15px; font-weight: 700; color: var(--sapphire-700); margin-bottom: 12px; word-break: break-all;" id="androidUrlDisplay">
+                  http://...
+                </div>
+                <p style="font-size: 12px; color: var(--slate-500);">
+                  ✓ મોબાઈલ અને કમ્પ્યુટર બંનેમાં એક જ ડેટા એકસાથે સેવ થશે.<br>
+                  ✓ મોબાઈલ ક્રોમમાં "Add to Home screen" અથવા "Install App" દબાવવાથી ગુરુકૃપા ક્રિએશન એપ ઇન્સ્ટોલ થઈ જશે!
+                </p>
+              </div>
+            </div>
+
+            <!-- Company Settings Form -->
+            <div class="premium-card">
+              <div class="card-header">
+                <h3>કંપની માહિતી (ચલણ અને રસીદ માટે)</h3>
+              </div>
+              <div class="card-body">
+                <form id="settingsForm" onsubmit="saveCompanySettings(event)">
+                  <div class="form-grid" style="margin-bottom: 16px;">
+                    <div class="form-group">
+                      <label>કંપનીનું નામ:</label>
+                      <input type="text" id="setCompanyName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                      <label>ટેગલાઇન / વિગત:</label>
+                      <input type="text" id="setCompanyTagline" class="form-control">
+                    </div>
+                  </div>
+                  <div class="form-grid" style="margin-bottom: 16px;">
+                    <div class="form-group">
+                      <label>મોબાઇલ નંબર:</label>
+                      <input type="text" id="setCompanyPhone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label>ચલણ પ્રિફિક્સ:</label>
+                      <input type="text" id="setChallanPrefix" class="form-control" value="GK-CH-">
+                    </div>
+                  </div>
+                  <div class="form-group" style="margin-bottom: 16px;">
+                    <label>કારખાનાનું સરનામું:</label>
+                    <textarea id="setCompanyAddress" class="form-control" rows="2"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">સેટિંગ્સ સેવ કરો</button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Backup & Export -->
+            <div class="premium-card">
+              <div class="card-header">
+                <h3>ડેટા બેકઅપ & સુરક્ષા</h3>
+              </div>
+              <div class="card-body" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px;">
+                <div>
+                  <h4 style="font-size: 14px; font-weight: 700;">ડેટાબેઝ બેકઅપ ડાઉનલોડ કરો</h4>
+                  <p style="font-size: 12px; color: var(--slate-500);">તમારા સમગ્ર હિસાબની એક સુરક્ષિત ફાઇલ સેવ કરો.</p>
+                </div>
+                <button class="btn btn-outline" onclick="downloadBackup()">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                  બેકઅપ ડાઉનલોડ (JSON)
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       MODALS (FORM DIALOGS)
+       =================================================================== -->
+  
+  <!-- 1. Add Inward Lot Modal -->
+  <div class="modal-overlay" id="modal-add-lot">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>નવો માલ એન્ટ્રી (Inward Lot)</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-lot')">&times;</button>
+      </div>
+      <form onsubmit="submitInwardLot(event)">
+        <div class="modal-body">
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>તારીખ:</label>
+              <input type="date" id="lotDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>લોટ નંબર (વૈકલ્પિક):</label>
+              <input type="text" id="lotNo" class="form-control" placeholder="દા.ત. LOT-101">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>વેપારી સિલેક્ટ કરો:</label>
+              <select id="lotMerchantSelect" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label>ડિઝાઇન પસંદ કરો:</label>
+              <select id="lotDesignSelect" class="form-control" required onchange="onLotDesignChange(this.value)"></select>
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>કુલ પીસ (નંગ):</label>
+              <input type="number" id="lotPieces" class="form-control" required min="1" oninput="calcLotTotal()">
+            </div>
+            <div class="form-group">
+              <label>વેપારી ભાવ (₹ per piece):</label>
+              <input type="number" id="lotRate" class="form-control" required step="0.5" oninput="calcLotTotal()">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>કુલ ઓર્ડર રકમ (₹):</label>
+            <input type="text" id="lotTotalAmount" class="form-control" readonly style="font-weight: 700; background: var(--slate-100);">
+          </div>
+          <div class="form-group">
+            <label>કાપડ વિગત / નોંધ:</label>
+            <input type="text" id="lotNotes" class="form-control" placeholder="દા.ત. કોટન પ્રિન્ટ, 2-પીસ સેટ">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-lot')">રદ કરો</button>
+          <button type="submit" class="btn btn-primary">માલ સેવ કરો</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. Add Merchant Modal -->
+  <div class="modal-overlay" id="modal-add-merchant">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>નવો વેપારી ઉમેરો</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-merchant')">&times;</button>
+      </div>
+      <form onsubmit="submitMerchant(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>વેપારી / પેઢીનું નામ:</label>
+            <input type="text" id="merchantName" class="form-control" required placeholder="દા.ત. શ્યામ ટેક્સટાઇલ">
+          </div>
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>મોબાઇલ નંબર:</label>
+            <input type="text" id="merchantPhone" class="form-control" placeholder="10 આંકડાનો મોબાઇલ નંબર">
+          </div>
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>સરનામું:</label>
+            <textarea id="merchantAddress" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label>નોંધ:</label>
+            <input type="text" id="merchantNotes" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-merchant')">રદ કરો</button>
+          <button type="submit" class="btn btn-primary">વેપારી સેવ કરો</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Add Design Modal -->
+  <div class="modal-overlay" id="modal-add-design">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>નવી ડિઝાઇન ઉમેરો</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-design')">&times;</button>
+      </div>
+      <form onsubmit="submitDesign(event)">
+        <div class="modal-body">
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>ડિઝાઇન નંબર:</label>
+              <input type="text" id="designNo" class="form-control" required placeholder="દા.ત. D-101">
+            </div>
+            <div class="form-group">
+              <label>ડિઝાઇન નામ:</label>
+              <input type="text" id="designName" class="form-control" placeholder="દા.ત. અનારકલી કુર્તી-પેન્ટ">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>વેપારી ભાવ (Party Rate ₹):</label>
+              <input type="number" id="designPartyRate" class="form-control" required step="0.5">
+            </div>
+            <div class="form-group">
+              <label>પ્રેસ ભાવ (Press Rate ₹):</label>
+              <input type="number" id="designPressRate" class="form-control" step="0.5" value="5">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>કારીગર કુર્તી સિલાઈ ભાવ (₹):</label>
+              <input type="number" id="designKurtiRate" class="form-control" required step="0.5">
+            </div>
+            <div class="form-group">
+              <label>કારીગર પેન્ટ સિલાઈ ભાવ (₹):</label>
+              <input type="number" id="designPantRate" class="form-control" required step="0.5">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>અંદાજિત મટીરીયલ ખર્ચ (₹):</label>
+              <input type="number" id="designMaterialCost" class="form-control" step="0.5" value="0">
+            </div>
+            <div class="form-group">
+              <label>નોંધ:</label>
+              <input type="text" id="designNotes" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-design')">રદ કરો</button>
+          <button type="submit" class="btn btn-primary">ડિઝાઇન સેવ કરો</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Add Karigar Work Entry Modal (Points 2 & 3: Kurti and Pant separate rates) -->
+  <div class="modal-overlay" id="modal-add-karigar-work">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>કારીગર કામ એન્ટ્રી (પીસ બનાવ્યા)</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-karigar-work')">&times;</button>
+      </div>
+      <form onsubmit="submitKarigarWork(event)">
+        <div class="modal-body">
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>તારીખ:</label>
+              <input type="date" id="workDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>કારીગર પસંદ કરો:</label>
+              <select id="workKarigarSelect" class="form-control" required></select>
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>ડિઝાઇન પસંદ કરો:</label>
+              <select id="workDesignSelect" class="form-control" required onchange="onWorkDesignChange(this.value)"></select>
+            </div>
+            <div class="form-group">
+              <label>સંબંધિત લોટ (વૈકલ્પિક):</label>
+              <select id="workLotSelect" class="form-control"></select>
+            </div>
+          </div>
+
+          <!-- Kurti Breakdown -->
+          <div style="background: var(--slate-100); padding: 12px; border-radius: var(--radius-md); margin-bottom: 12px;">
+            <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--sapphire-700);">કુર્તી સિલાઈ (Kurti Work)</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>કુર્તી પીસ (નંગ):</label>
+                <input type="number" id="workKurtiPcs" class="form-control" min="0" value="0" oninput="calcWorkTotal()">
+              </div>
+              <div class="form-group">
+                <label>કુર્તી ભાવ (₹ per piece):</label>
+                <input type="number" id="workKurtiRate" class="form-control" step="0.5" value="0" oninput="calcWorkTotal()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Pant Breakdown -->
+          <div style="background: var(--slate-100); padding: 12px; border-radius: var(--radius-md); margin-bottom: 12px;">
+            <div style="font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--sapphire-700);">પેન્ટ સિલાઈ (Pant Work)</div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>પેન્ટ પીસ (નંગ):</label>
+                <input type="number" id="workPantPcs" class="form-control" min="0" value="0" oninput="calcWorkTotal()">
+              </div>
+              <div class="form-group">
+                <label>પેન્ટ ભાવ (₹ per piece):</label>
+                <input type="number" id="workPantRate" class="form-control" step="0.5" value="0" oninput="calcWorkTotal()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Other / Alteration Work -->
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>અન્ય કામ પીસ (નંગ):</label>
+              <input type="number" id="workOtherPcs" class="form-control" min="0" value="0" oninput="calcWorkTotal()">
+            </div>
+            <div class="form-group">
+              <label>અન્ય કામ ભાવ (₹):</label>
+              <input type="number" id="workOtherRate" class="form-control" step="0.5" value="0" oninput="calcWorkTotal()">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>કુલ સિલાઈ રકમ (₹):</label>
+            <input type="text" id="workTotalAmount" class="form-control" readonly style="font-size: 16px; font-weight: 800; color: var(--sapphire-700); background: #ffffff;">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-karigar-work')">રદ કરો</button>
+          <button type="submit" class="btn btn-primary">કામ સેવ કરો</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. Add Karigar Upad Modal (Point 3: Advance cash) -->
+  <div class="modal-overlay" id="modal-add-upad">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>કારીગર ઉપાડ નોંધો (Advance Payment)</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-upad')">&times;</button>
+      </div>
+      <form onsubmit="submitKarigarUpad(event)">
+        <div class="modal-body">
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>તારીખ:</label>
+              <input type="date" id="upadDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>કારીગર પસંદ કરો:</label>
+              <select id="upadKarigarSelect" class="form-control" required></select>
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>ઉપાડ રકમ (₹):</label>
+              <input type="number" id="upadAmount" class="form-control" required min="1" placeholder="દા.ત. 1000">
+            </div>
+            <div class="form-group">
+              <label>પેમેન્ટ મોડ:</label>
+              <select id="upadPaymentMode" class="form-control">
+                <option value="રોકડ">રોકડ (Cash)</option>
+                <option value="Google Pay / UPI">Google Pay / PhonePe (UPI)</option>
+                <option value="બેંક ટ્રાન્સફર">બેંક ટ્રાન્સફર (Bank)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>નોંધ / કારણ:</label>
+            <input type="text" id="upadNotes" class="form-control" placeholder="દા.ત. ઘર ખર્ચ, તહેવાર">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-upad')">રદ કરો</button>
+          <button type="submit" class="btn btn-danger">ઉપાડ સેવ કરો</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. Add Karigar Master Modal -->
+  <div class="modal-overlay" id="modal-add-karigar">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>નવો કારીગર ઉમેરો</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-karigar')">&times;</button>
+      </div>
+      <form onsubmit="submitKarigar(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>કારીગરનું નામ:</label>
+            <input type="text" id="karigarName" class="form-control" required placeholder="દા.ત. રમેશભાઈ">
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>મોબાઇલ નંબર:</label>
+              <input type="text" id="karigarPhone" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>કામનો પ્રકાર:</label>
+              <select id="karigarSpeciality" class="form-control">
+                <option value="સિલાઈ (કુર્તી/પેન્ટ)">સિલાઈ (કુર્તી/પેન્ટ)</option>
+                <option value="કટિંગ">કટિંગ</option>
+                <option value="ઓવરલોક">ઓવરલોક</option>
+                <option value="પેકિંગ">પેકિંગ</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>સરનામું:</label>
+            <textarea id="karigarAddress" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-karigar')">રદ કરો</button>
+          <button type="submit" class="btn btn-primary">કારીગર સેવ કરો</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. Add Press Entry Modal (Point 5) -->
+  <div class="modal-overlay" id="modal-add-press-entry">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>પ્રેસ કામ નોંધો (Press Entry)</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-press-entry')">&times;</button>
+      </div>
+      <form onsubmit="submitPressEntry(event)">
+        <div class="modal-body">
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>તારીખ:</label>
+              <input type="date" id="pressDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>પ્રેસ વાળા પસંદ કરો:</label>
+              <select id="pressVendorSelect" class="form-control" required onchange="onPressVendorChange(this.value)"></select>
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>ડિઝાઇન પસંદ કરો:</label>
+            <select id="pressDesignSelect" class="form-control" onchange="onPressDesignChange(this.value)"></select>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>પ્રેસ થયેલા પીસ (નંગ):</label>
+              <input type="number" id="pressPieces" class="form-control" required min="1" oninput="calcPressTotal()">
+            </div>
+            <div class="form-group">
+              <label>ભાવ (₹ per piece):</label>
+              <input type="number" id="pressRate" class="form-control" required step="0.5" oninput="calcPressTotal()">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>કુલ રકમ (₹):</label>
+              <input type="text" id="pressTotalAmount" class="form-control" readonly style="font-weight: 700; background: var(--slate-100);">
+            </div>
+            <div class="form-group">
+              <label>પેમેન્ટ સ્થિતિ:</label>
+              <select id="pressStatus" class="form-control">
+                <option value="બાકી">બાકી (Unpaid)</option>
+                <option value="ચૂકવેલ">ચૂકવેલ (Paid)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-press-entry')">રદ કરો</button>
+          <button type="submit" class="btn btn-primary">પ્રેસ એન્ટ્રી સેવ કરો</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 8. Add Press Vendor Modal -->
+  <div class="modal-overlay" id="modal-add-press-vendor">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>નવા પ્રેસ વાળા ઉમેરો</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-press-vendor')">&times;</button>
+      </div>
+      <form onsubmit="submitPressVendor(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>પ્રેસ વાળાનું નામ:</label>
+            <input type="text" id="pressVendorName" class="form-control" required placeholder="દા.ત. મુકેશ પ્રેસ">
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>મોબાઇલ નંબર:</label>
+              <input type="text" id="pressVendorPhone" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>ડિફોલ્ટ પ્રેસ ભાવ (₹):</label>
+              <input type="number" id="pressVendorDefaultRate" class="form-control" step="0.5" value="5">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-press-vendor')">રદ કરો</button>
+          <button type="submit" class="btn btn-primary">સેવ કરો</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 9. Add Raw Material Modal (Point 6) -->
+  <div class="modal-overlay" id="modal-add-material">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>મટીરીયલ્સ / કાચો માલ ખર્ચ</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-material')">&times;</button>
+      </div>
+      <form onsubmit="submitMaterial(event)">
+        <div class="modal-body">
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>તારીખ:</label>
+              <input type="date" id="matDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>મટીરીયલ નામ:</label>
+              <input type="text" id="matName" class="form-control" required placeholder="દા.ત. દોરો, બટન, ઝિપ, પેકિંગ બેગ">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>જથ્થો (Quantity):</label>
+              <input type="number" id="matQty" class="form-control" required min="1" step="0.1" oninput="calcMatTotal()">
+            </div>
+            <div class="form-group">
+              <label>એકમ (Unit):</label>
+              <select id="matUnit" class="form-control">
+                <option value="નંગ">નંગ (Pieces)</option>
+                <option value="મીટર">મીટર (Meters)</option>
+                <option value="બોબીન/રોલ">બોબીન / રોલ (Roll)</option>
+                <option value="કિલો">કિલો (Kg)</option>
+                <option value="બોક્સ/પેકેટ">બોક્સ / પેકેટ (Box)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>ભાવ (₹ per unit):</label>
+              <input type="number" id="matRate" class="form-control" required step="0.5" oninput="calcMatTotal()">
+            </div>
+            <div class="form-group">
+              <label>કુલ રકમ (₹):</label>
+              <input type="text" id="matTotal" class="form-control" readonly style="font-weight: 700; background: var(--slate-100);">
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>દુકાન / સપ્લાયર:</label>
+              <input type="text" id="matSupplier" class="form-control">
+            </div>
+            <div class="form-group">
+              <label>બિલ નં. / નોંધ:</label>
+              <input type="text" id="matBillNo" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-material')">રદ કરો</button>
+          <button type="submit" class="btn btn-primary">મટીરીયલ સેવ કરો</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 10. Add Factory Expense Modal (Point 7: Rent, Light, Water, Cleaning, Tea) -->
+  <div class="modal-overlay" id="modal-add-expense">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>કારખાના ખાતા ખર્ચ નોંધો</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-expense')">&times;</button>
+      </div>
+      <form onsubmit="submitExpense(event)">
+        <div class="modal-body">
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>તારીખ:</label>
+              <input type="date" id="expDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>ખર્ચ કેટેગરી પસંદ કરો:</label>
+              <select id="expCategory" class="form-control" required>
+                <option value="લાઈટ બિલ">લાઈટ બિલ (Electricity Bill)</option>
+                <option value="કચરો વાળવા વાળો">કચરો વાળવા વાળો (Cleaning & Waste)</option>
+                <option value="કારખાના ભાડું">કારખાના ભાડું (Factory Rent)</option>
+                <option value="પાણી બિલ / કેન">પાણી બિલ / કેન (Drinking & Factory Water)</option>
+                <option value="ચા-નાસ્તો">ચા-નાસ્તો (Tea & Refreshments)</option>
+                <option value="મશીન રિપેરિંગ / ઓઈલ / સોય">મશીન રિપેરિંગ / ઓઈલ / સોય</option>
+                <option value="સ્ટેશનરી & પ્રિન્ટિંગ">સ્ટેશનરી & પ્રિન્ટિંગ</option>
+                <option value="અન્ય પરચૂરણ ખર્ચ">અન્ય પરચૂરણ ખર્ચ (Miscellaneous)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>ખર્ચ રકમ (₹):</label>
+              <input type="number" id="expAmount" class="form-control" required min="1" placeholder="દા.ત. 1500">
+            </div>
+            <div class="form-group">
+              <label>પેમેન્ટ મોડ:</label>
+              <select id="expPaymentMode" class="form-control">
+                <option value="રોકડ">રોકડ (Cash)</option>
+                <option value="Google Pay / UPI">Google Pay / UPI</option>
+                <option value="બેંક ટ્રાન્સફર">બેંક ટ્રાન્સફર</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>ચૂકવ્યા (Paid To):</label>
+              <input type="text" id="expPaidTo" class="form-control" placeholder="દા.ત. મકાન માલિક, વીજ કંપની">
+            </div>
+            <div class="form-group">
+              <label>નોંધ:</label>
+              <input type="text" id="expNotes" class="form-control">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-expense')">રદ કરો</button>
+          <button type="submit" class="btn btn-danger">ખર્ચ સેવ કરો</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 11. Add Fixed Staff Modal (Point 9) -->
+  <div class="modal-overlay" id="modal-add-staff">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>નવો ફિક્સ પગાર સ્ટાફ ઉમેરો</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-staff')">&times;</button>
+      </div>
+      <form onsubmit="submitStaff(event)">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>કર્મચારી નામ:</label>
+            <input type="text" id="staffName" class="form-control" required placeholder="દા.ત. પ્રકાશભાઈ">
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>રોલ (હોદ્દો):</label>
+              <input type="text" id="staffRole" class="form-control" required placeholder="દા.ત. કટિંગ માસ્ટર, પેકિંગ, હેલ્પર">
+            </div>
+            <div class="form-group">
+              <label>મોબાઇલ નંબર:</label>
+              <input type="text" id="staffPhone" class="form-control">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>પગાર પ્રકાર:</label>
+              <select id="staffSalaryType" class="form-control">
+                <option value="દૈનિક">દૈનિક રોજિંદો (Daily Wage)</option>
+                <option value="કલાક દીઠ">કલાક દીઠ (Hourly Rate)</option>
+                <option value="માસિક">માસિક ફિક્સ પગાર (Monthly)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>મૂળ રકમ (₹):</label>
+              <input type="number" id="staffBaseRate" class="form-control" required placeholder="દા.ત. 500 (દિવસના)">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>માનક કલાકો (દિવસ દીઠ):</label>
+            <input type="number" id="staffStdHours" class="form-control" value="8" step="0.5">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-staff')">રદ કરો</button>
+          <button type="submit" class="btn btn-primary">સ્ટાફ સેવ કરો</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 12. Add Staff Attendance & Hours Modal (Point 9) -->
+  <div class="modal-overlay" id="modal-add-staff-attendance">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>દૈનિક હાજરી અને કલાક નોંધો</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-staff-attendance')">&times;</button>
+      </div>
+      <form onsubmit="submitStaffAttendance(event)">
+        <div class="modal-body">
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>તારીખ:</label>
+              <input type="date" id="attDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>કર્મચારી સિલેક્ટ કરો:</label>
+              <select id="attStaffSelect" class="form-control" required onchange="onStaffSelectChange(this.value)"></select>
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>હાજરી સ્થિતિ:</label>
+              <select id="attStatus" class="form-control" onchange="onAttStatusChange(this.value)">
+                <option value="હાજર">હાજર (Full Day)</option>
+                <option value="અડધો દિવસ">અડધો દિવસ (Half Day)</option>
+                <option value="ઓવરટાઈમ">ઓવરટાઈમ (Overtime)</option>
+                <option value="ગેરહાજર">ગેરહાજર (Absent)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>કામના કલાકો (Hours):</label>
+              <input type="number" id="attHours" class="form-control" value="8" step="0.5" required oninput="calcStaffPay()">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>ગણેલો પગાર (₹):</label>
+              <input type="number" id="attCalculatedPay" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>ઉપાડ કપાત (જો હોય તો ₹):</label>
+              <input type="number" id="attAdvanceDeduction" class="form-control" value="0">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>નોંધ:</label>
+            <input type="text" id="attNotes" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-staff-attendance')">રદ કરો</button>
+          <button type="submit" class="btn btn-primary">હાજરી સેવ કરો</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 13. Create Delivery Challan Modal (with automatic print!) -->
+  <div class="modal-overlay" id="modal-add-challan">
+    <div class="modal-content" style="max-width: 720px;">
+      <div class="modal-header">
+        <h3>નવું વેપારી માલ ચલણ બનાવો (Delivery Challan)</h3>
+        <button class="modal-close" onclick="closeModal('modal-add-challan')">&times;</button>
+      </div>
+      <form onsubmit="submitDeliveryChallan(event)">
+        <div class="modal-body">
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>ચલણ તારીખ:</label>
+              <input type="date" id="challanDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label>ચલણ નંબર (ઓટો):</label>
+              <input type="text" id="challanNo" class="form-control" placeholder="ઓટોમેટિક જનરેટ થશે" readonly style="background: var(--slate-100);">
+            </div>
+          </div>
+          <div class="form-grid" style="margin-bottom: 14px;">
+            <div class="form-group">
+              <label>વેપારી પસંદ કરો:</label>
+              <select id="challanMerchantSelect" class="form-control" required onchange="onChallanMerchantChange(this.value)"></select>
+            </div>
+            <div class="form-group">
+              <label>સંબંધિત લોટ (જો હોય તો):</label>
+              <select id="challanLotSelect" class="form-control" onchange="onChallanLotChange(this.value)"></select>
+            </div>
+          </div>
+
+          <!-- Items Row Container -->
+          <div style="margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <label style="font-weight: 700; font-size: 13px;">માલ વિગત (ચલણ આઈટમ્સ):</label>
+              <button type="button" class="btn btn-sm btn-outline" onclick="addChallanItemRow()">+ નવી લાઇન ઉમેરો</button>
+            </div>
+            <div id="challanItemsContainer" style="display: flex; flex-direction: column; gap: 8px;">
+              <!-- Dynamic Item Rows -->
+            </div>
+          </div>
+
+          <div class="form-grid" style="background: var(--slate-100); padding: 12px; border-radius: var(--radius-md); margin-bottom: 14px;">
+            <div class="form-group">
+              <label>કુલ પીસ (Total Pieces):</label>
+              <input type="text" id="challanTotalPieces" class="form-control" readonly style="font-weight: 700;">
+            </div>
+            <div class="form-group">
+              <label>કુલ રકમ (Grand Total ₹):</label>
+              <input type="text" id="challanGrandTotal" class="form-control" readonly style="font-weight: 800; font-size: 16px; color: var(--emerald-700);">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>નોંધ / વાહન નં. / ડિલિવરી લેનાર:</label>
+            <input type="text" id="challanNotes" class="form-control">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('modal-add-challan')">રદ કરો</button>
+          <button type="submit" class="btn btn-success" style="font-weight: 700;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            ચલણ બનાવો અને ઓટોમેટિક પ્રિન્ટ કરો
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================
+       OFFICIAL PRINTABLE DOCUMENT TEMPLATES (CHALLAN & SALARY SLIP)
+       =================================================================== -->
+  <div id="printableArea">
+    <!-- Populated dynamically and printed via window.print() -->
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Application Logic -->
+  <script src="./app.js"></script>
+
+  <!-- PWA Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration error:', err));
+      });
+    }
+  </script>
+</body>
+</html>
