@@ -1,7 +1,11 @@
 // Gurukrupa Creation - Frontend Core Application Logic
+// Integrated with Supabase Cloud Database + Local Server Sync
 // Passcode: 6390
 
 const APP_PASSCODE = '6390';
+const SUPABASE_URL = 'https://vlzcckwtufnqfqdwblgk.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_J7FK-c4VtzqWUGAImyj6_w_e9G4GQwd';
+
 let currentPin = '';
 let authToken = localStorage.getItem('gk_auth_token') || '';
 let currentTab = 'dashboard';
@@ -60,30 +64,13 @@ function updatePinDots() {
 }
 
 async function verifyPasscode() {
-  try {
-    const res = await fetch('/api/auth/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ passcode: currentPin }),
-    });
-    const data = await res.json();
-
-    if (data.success && data.token) {
-      authToken = data.token;
-      localStorage.setItem('gk_auth_token', authToken);
-      unlockApp();
-      showToast('સફળ પ્રવેશ! સ્વાગત છે.', 'success');
-    } else {
-      handlePinError();
-    }
-  } catch (err) {
-    if (currentPin === APP_PASSCODE) {
-      authToken = 'local-valid-token';
-      localStorage.setItem('gk_auth_token', authToken);
-      unlockApp();
-    } else {
-      handlePinError();
-    }
+  if (currentPin === APP_PASSCODE) {
+    authToken = 'gk_authenticated_session';
+    localStorage.setItem('gk_auth_token', authToken);
+    unlockApp();
+    showToast('સફળ પ્રવેશ! સ્વાગત છે.', 'success');
+  } else {
+    handlePinError();
   }
 }
 
@@ -126,7 +113,6 @@ window.addEventListener('keydown', (e) => {
 
 // Check existing session
 window.addEventListener('DOMContentLoaded', () => {
-  // Set default dates on all date inputs
   const today = new Date().toISOString().split('T')[0];
   document.querySelectorAll('input[type="date"]').forEach(inp => {
     if (!inp.value) inp.value = today;
@@ -140,28 +126,576 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // ===================================================================
-// API CLIENT WRAPPER
+// SUPABASE CLOUD DATABASE API CLIENT
 // ===================================================================
-async function api(endpoint, options = {}) {
+async function supabaseFetch(table, path = '', options = {}) {
+  const url = `${SUPABASE_URL}/rest/v1/${table}${path}`;
   const headers = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
     'Content-Type': 'application/json',
-    'x-passcode': APP_PASSCODE,
+    'Prefer': 'return=representation',
     ...(options.headers || {}),
   };
-  if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`;
-  }
-
-  const res = await fetch(endpoint, { ...options, headers });
-  if (res.status === 401) {
-    lockApp();
-    throw new Error('સત્ર સમાપ્ત થઈ ગયું છે. ફરી પાસવર્ડ દાખલ કરો.');
-  }
-  const data = await res.json();
+  const res = await fetch(url, { ...options, headers });
   if (!res.ok) {
-    throw new Error(data.message || data.error || 'કાંઈક ભૂલ થઈ છે.');
+    const err = await res.json().catch(() => ({ message: res.statusText }));
+    throw new Error(err.message || 'Supabase error');
   }
-  return data;
+  return res.json().catch(() => []);
+}
+
+// Unified API Router (connects to Supabase Cloud)
+async function api(endpoint, options = {}) {
+  const method = (options.method || 'GET').toUpperCase();
+  const body = options.body ? JSON.parse(options.body) : {};
+
+  try {
+    // 1. SETTINGS
+    if (endpoint === '/api/settings') {
+      if (method === 'GET') {
+        const rows = await supabaseFetch('app_settings', '?select=*');
+        const settings = {};
+        rows.forEach(r => { settings[r.key] = r.value; });
+        return settings;
+      }
+      if (method === 'POST') {
+        for (const [k, v] of Object.entries(body)) {
+          await supabaseFetch('app_settings', `?on_conflict=key`, {
+            method: 'POST',
+            body: JSON.stringify({ key: k, value: String(v) })
+          });
+        }
+        return { success: true };
+      }
+    }
+
+    // 2. MERCHANTS
+    if (endpoint === '/api/merchants') {
+      if (method === 'GET') {
+        return await supabaseFetch('merchants', '?select=*&order=name.asc');
+      }
+      if (method === 'POST') {
+        const rows = await supabaseFetch('merchants', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: body.name.trim(),
+            phone: body.phone || '',
+            address: body.address || '',
+            notes: body.notes || ''
+          })
+        });
+        return { id: rows[0]?.id };
+      }
+    }
+    if (endpoint.startsWith('/api/merchants/')) {
+      const id = endpoint.split('/')[3];
+      if (method === 'DELETE') {
+        await supabaseFetch('merchants', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    // 3. DESIGNS
+    if (endpoint === '/api/designs') {
+      if (method === 'GET') {
+        return await supabaseFetch('designs', '?select=*&order=design_no.asc');
+      }
+      if (method === 'POST') {
+        const rows = await supabaseFetch('designs', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            design_no: body.design_no.trim(),
+            name: body.name || '',
+            party_rate: Number(body.party_rate) || 0,
+            karigar_kurti_rate: Number(body.karigar_kurti_rate) || 0,
+            karigar_pant_rate: Number(body.karigar_pant_rate) || 0,
+            press_rate: Number(body.press_rate) || 0,
+            material_cost: Number(body.material_cost) || 0,
+            notes: body.notes || ''
+          })
+        });
+        return { id: rows[0]?.id };
+      }
+    }
+    if (endpoint.startsWith('/api/designs/')) {
+      const id = endpoint.split('/')[3];
+      if (method === 'DELETE') {
+        await supabaseFetch('designs', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    // 4. INWARD LOTS
+    if (endpoint === '/api/lots') {
+      if (method === 'GET') {
+        const rows = await supabaseFetch('inward_lots', '?select=*,merchants(name),designs(design_no,name)&order=date.desc,id.desc');
+        return rows.map(r => ({
+          ...r,
+          merchant_name: r.merchants?.name,
+          design_no: r.designs?.design_no,
+          design_name: r.designs?.name
+        }));
+      }
+      if (method === 'POST') {
+        const pcs = Number(body.total_pieces) || 0;
+        const rate = Number(body.rate_per_piece) || 0;
+        const total = pcs * rate;
+        const lot_no = body.lot_no ? body.lot_no.trim() : `LOT-${Date.now().toString().slice(-5)}`;
+        const rows = await supabaseFetch('inward_lots', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            lot_no,
+            merchant_id: Number(body.merchant_id),
+            design_id: Number(body.design_id),
+            date: body.date,
+            total_pieces: pcs,
+            rate_per_piece: rate,
+            total_amount: total,
+            fabric_details: body.fabric_details || '',
+            status: body.status || 'કામ ચાલુ છે',
+            notes: body.notes || ''
+          })
+        });
+        return { id: rows[0]?.id };
+      }
+    }
+    if (endpoint.startsWith('/api/lots/')) {
+      const id = endpoint.split('/')[3];
+      if (method === 'DELETE') {
+        await supabaseFetch('inward_lots', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    // 5. KARIGARS & LEDGER
+    if (endpoint === '/api/karigars') {
+      if (method === 'GET') {
+        return await supabaseFetch('karigars', '?select=*&order=name.asc');
+      }
+      if (method === 'POST') {
+        const rows = await supabaseFetch('karigars', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: body.name.trim(),
+            phone: body.phone || '',
+            speciality: body.speciality || 'સિલાઈ',
+            address: body.address || ''
+          })
+        });
+        return { id: rows[0]?.id };
+      }
+    }
+    if (endpoint.startsWith('/api/karigars/')) {
+      const parts = endpoint.split('/');
+      const id = parts[3];
+      if (parts[4] === 'ledger' && method === 'GET') {
+        const [kRes, wRes, uRes] = await Promise.all([
+          supabaseFetch('karigars', `?id=eq.${id}&select=*`),
+          supabaseFetch('karigar_work_entries', `?karigar_id=eq.${id}&select=*,designs(design_no,name)&order=date.desc,id.desc`),
+          supabaseFetch('karigar_upad', `?karigar_id=eq.${id}&select=*&order=date.desc,id.desc`),
+        ]);
+        const karigar = kRes[0];
+        const workEntries = wRes.map(w => ({ ...w, design_no: w.designs?.design_no, design_name: w.designs?.name }));
+        const upadEntries = uRes;
+        const totalEarned = workEntries.reduce((s, w) => s + (Number(w.total_amount) || 0), 0);
+        const totalUpad = upadEntries.reduce((s, u) => s + (Number(u.amount) || 0), 0);
+        return {
+          karigar,
+          workEntries,
+          upadEntries,
+          summary: { totalEarned, totalUpad, netBalance: totalEarned - totalUpad }
+        };
+      }
+      if (method === 'DELETE') {
+        await supabaseFetch('karigars', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    // 6. KARIGAR WORK
+    if (endpoint === '/api/karigar-work') {
+      if (method === 'GET') {
+        const rows = await supabaseFetch('karigar_work_entries', '?select=*,karigars(name),designs(design_no,name),inward_lots(lot_no)&order=date.desc,id.desc');
+        return rows.map(r => ({
+          ...r,
+          karigar_name: r.karigars?.name,
+          design_no: r.designs?.design_no,
+          design_name: r.designs?.name,
+          lot_no: r.inward_lots?.lot_no
+        }));
+      }
+      if (method === 'POST') {
+        const kPcs = Number(body.kurti_pieces) || 0;
+        const kRate = Number(body.kurti_rate) || 0;
+        const pPcs = Number(body.pant_pieces) || 0;
+        const pRate = Number(body.pant_rate) || 0;
+        const oPcs = Number(body.other_pieces) || 0;
+        const oRate = Number(body.other_rate) || 0;
+        const total = (kPcs * kRate) + (pPcs * pRate) + (oPcs * oRate);
+
+        const rows = await supabaseFetch('karigar_work_entries', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            karigar_id: Number(body.karigar_id),
+            design_id: Number(body.design_id),
+            lot_id: body.lot_id ? Number(body.lot_id) : null,
+            date: body.date,
+            kurti_pieces: kPcs,
+            kurti_rate: kRate,
+            pant_pieces: pPcs,
+            pant_rate: pRate,
+            other_pieces: oPcs,
+            other_rate: oRate,
+            other_label: body.other_label || '',
+            total_amount: total,
+            notes: body.notes || ''
+          })
+        });
+        return { id: rows[0]?.id, total_amount: total };
+      }
+    }
+    if (endpoint.startsWith('/api/karigar-work/')) {
+      const id = endpoint.split('/')[3];
+      if (method === 'DELETE') {
+        await supabaseFetch('karigar_work_entries', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    // 7. KARIGAR UPAD
+    if (endpoint === '/api/karigar-upad') {
+      if (method === 'GET') {
+        const rows = await supabaseFetch('karigar_upad', '?select=*,karigars(name)&order=date.desc,id.desc');
+        return rows.map(r => ({ ...r, karigar_name: r.karigars?.name }));
+      }
+      if (method === 'POST') {
+        const rows = await supabaseFetch('karigar_upad', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            karigar_id: Number(body.karigar_id),
+            date: body.date,
+            amount: Number(body.amount) || 0,
+            payment_mode: body.payment_mode || 'રોકડ',
+            notes: body.notes || ''
+          })
+        });
+        return { id: rows[0]?.id };
+      }
+    }
+    if (endpoint.startsWith('/api/karigar-upad/')) {
+      const id = endpoint.split('/')[3];
+      if (method === 'DELETE') {
+        await supabaseFetch('karigar_upad', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    // 8. PRESS VENDORS & ENTRIES
+    if (endpoint === '/api/press-vendors') {
+      if (method === 'GET') {
+        return await supabaseFetch('press_vendors', '?select=*&order=name.asc');
+      }
+      if (method === 'POST') {
+        const rows = await supabaseFetch('press_vendors', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: body.name.trim(),
+            phone: body.phone || '',
+            default_rate: Number(body.default_rate) || 0
+          })
+        });
+        return { id: rows[0]?.id };
+      }
+    }
+    if (endpoint.startsWith('/api/press-vendors/')) {
+      const id = endpoint.split('/')[3];
+      if (method === 'DELETE') {
+        await supabaseFetch('press_vendors', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    if (endpoint === '/api/press-entries') {
+      if (method === 'GET') {
+        const rows = await supabaseFetch('press_entries', '?select=*,press_vendors(name),designs(design_no,name)&order=date.desc,id.desc');
+        return rows.map(r => ({
+          ...r,
+          vendor_name: r.press_vendors?.name,
+          design_no: r.designs?.design_no,
+          design_name: r.designs?.name
+        }));
+      }
+      if (method === 'POST') {
+        const pcs = Number(body.pieces) || 0;
+        const rate = Number(body.rate_per_piece) || 0;
+        const rows = await supabaseFetch('press_entries', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            vendor_id: Number(body.vendor_id),
+            design_id: body.design_id ? Number(body.design_id) : null,
+            date: body.date,
+            pieces: pcs,
+            rate_per_piece: rate,
+            total_amount: pcs * rate,
+            status: body.status || 'બાકી',
+            notes: body.notes || ''
+          })
+        });
+        return { id: rows[0]?.id, total_amount: pcs * rate };
+      }
+    }
+    if (endpoint.startsWith('/api/press-entries/')) {
+      const id = endpoint.split('/')[3];
+      if (method === 'DELETE') {
+        await supabaseFetch('press_entries', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    // 9. MATERIALS
+    if (endpoint === '/api/materials') {
+      if (method === 'GET') {
+        return await supabaseFetch('materials', '?select=*&order=date.desc,id.desc');
+      }
+      if (method === 'POST') {
+        const qty = Number(body.quantity) || 0;
+        const rate = Number(body.rate) || 0;
+        const rows = await supabaseFetch('materials', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            material_name: body.material_name.trim(),
+            date: body.date,
+            quantity: qty,
+            unit: body.unit || 'નંગ',
+            rate,
+            total_amount: qty * rate,
+            supplier_name: body.supplier_name || '',
+            bill_no: body.bill_no || '',
+            notes: body.notes || ''
+          })
+        });
+        return { id: rows[0]?.id, total_amount: qty * rate };
+      }
+    }
+    if (endpoint.startsWith('/api/materials/')) {
+      const id = endpoint.split('/')[3];
+      if (method === 'DELETE') {
+        await supabaseFetch('materials', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    // 10. FACTORY EXPENSES
+    if (endpoint === '/api/expenses') {
+      if (method === 'GET') {
+        return await supabaseFetch('factory_expenses', '?select=*&order=date.desc,id.desc');
+      }
+      if (method === 'POST') {
+        const rows = await supabaseFetch('factory_expenses', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            category: body.category.trim(),
+            date: body.date,
+            amount: Number(body.amount) || 0,
+            paid_to: body.paid_to || '',
+            payment_mode: body.payment_mode || 'રોકડ',
+            notes: body.notes || ''
+          })
+        });
+        return { id: rows[0]?.id };
+      }
+    }
+    if (endpoint.startsWith('/api/expenses/')) {
+      const id = endpoint.split('/')[3];
+      if (method === 'DELETE') {
+        await supabaseFetch('factory_expenses', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    // 11. FIXED STAFF & ATTENDANCE
+    if (endpoint === '/api/staff') {
+      if (method === 'GET') {
+        return await supabaseFetch('fixed_staff', '?select=*&order=name.asc');
+      }
+      if (method === 'POST') {
+        const rows = await supabaseFetch('fixed_staff', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: body.name.trim(),
+            phone: body.phone || '',
+            role: body.role || 'હેલ્પર',
+            salary_type: body.salary_type || 'દૈનિક',
+            base_rate: Number(body.base_rate) || 0,
+            standard_hours: Number(body.standard_hours) || 8
+          })
+        });
+        return { id: rows[0]?.id };
+      }
+    }
+    if (endpoint.startsWith('/api/staff/')) {
+      const id = endpoint.split('/')[3];
+      if (method === 'DELETE') {
+        await supabaseFetch('fixed_staff', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    if (endpoint === '/api/staff-attendance') {
+      if (method === 'GET') {
+        const rows = await supabaseFetch('staff_attendance', '?select=*,fixed_staff(name,role)&order=date.desc,id.desc');
+        return rows.map(r => ({
+          ...r,
+          staff_name: r.fixed_staff?.name,
+          role: r.fixed_staff?.role
+        }));
+      }
+      if (method === 'POST') {
+        const rows = await supabaseFetch('staff_attendance', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            staff_id: Number(body.staff_id),
+            date: body.date,
+            status: body.status || 'હાજર',
+            hours_worked: Number(body.hours_worked) || 8,
+            calculated_pay: Number(body.calculated_pay) || 0,
+            advance_deduction: Number(body.advance_deduction) || 0,
+            notes: body.notes || ''
+          })
+        });
+        return { id: rows[0]?.id };
+      }
+    }
+    if (endpoint.startsWith('/api/staff-attendance/')) {
+      const id = endpoint.split('/')[3];
+      if (method === 'DELETE') {
+        await supabaseFetch('staff_attendance', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    // 12. DELIVERY CHALLANS
+    if (endpoint === '/api/challans') {
+      if (method === 'GET') {
+        const rows = await supabaseFetch('delivery_challans', '?select=*,merchants(name,phone,address)&order=date.desc,id.desc');
+        return rows.map(r => ({
+          ...r,
+          merchant_name: r.merchants?.name,
+          merchant_phone: r.merchants?.phone,
+          merchant_address: r.merchants?.address,
+          items: typeof r.items_json === 'string' ? JSON.parse(r.items_json) : r.items_json
+        }));
+      }
+      if (method === 'POST') {
+        const items = Array.isArray(body.items) ? body.items : [];
+        let totalPieces = 0;
+        let grandTotal = 0;
+        for (const item of items) {
+          totalPieces += Number(item.pieces) || 0;
+          grandTotal += (Number(item.pieces) || 0) * (Number(item.rate) || 0);
+        }
+        const prefix = state.settings.challan_prefix || 'GK-CH-';
+        const challan_no = body.challan_no || `${prefix}${Date.now().toString().slice(-6)}`;
+
+        const rows = await supabaseFetch('delivery_challans', '', {
+          method: 'POST',
+          body: JSON.stringify({
+            challan_no,
+            date: body.date,
+            merchant_id: Number(body.merchant_id),
+            lot_id: body.lot_id ? Number(body.lot_id) : null,
+            items_json: items,
+            total_pieces: totalPieces,
+            grand_total: grandTotal,
+            notes: body.notes || '',
+            status: body.status || 'જમા કરાવેલ'
+          })
+        });
+
+        if (body.lot_id) {
+          await supabaseFetch('inward_lots', `?id=eq.${body.lot_id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status: 'વેપારીને જમા' })
+          });
+        }
+
+        return { id: rows[0]?.id, challan_no, total_pieces: totalPieces, grand_total: grandTotal };
+      }
+    }
+    if (endpoint.startsWith('/api/challans/')) {
+      const id = endpoint.split('/')[3];
+      if (method === 'GET') {
+        const rows = await supabaseFetch('delivery_challans', `?id=eq.${id}&select=*,merchants(name,phone,address)`);
+        const r = rows[0];
+        if (!r) throw new Error('ચલણ મળ્યું નથી');
+        return {
+          ...r,
+          merchant_name: r.merchants?.name,
+          merchant_phone: r.merchants?.phone,
+          merchant_address: r.merchants?.address,
+          items: typeof r.items_json === 'string' ? JSON.parse(r.items_json) : r.items_json
+        };
+      }
+      if (method === 'DELETE') {
+        await supabaseFetch('delivery_challans', `?id=eq.${id}`, { method: 'DELETE' });
+        return { success: true };
+      }
+    }
+
+    // 13. P&L ANALYTICS ENGINE
+    if (endpoint.startsWith('/api/analytics/pnl')) {
+      const urlObj = new URL(`http://dummy.com${endpoint}`);
+      const from = urlObj.searchParams.get('from');
+      const to = urlObj.searchParams.get('to');
+      const dateFilter = (from && to) ? `&date=gte.${from}&date=lte.${to}` : '';
+
+      const [lots, work, press, mat, exp, staffAtt, upad] = await Promise.all([
+        supabaseFetch('inward_lots', `?select=total_amount,total_pieces${dateFilter}`),
+        supabaseFetch('karigar_work_entries', `?select=total_amount,kurti_pieces,pant_pieces${dateFilter}`),
+        supabaseFetch('press_entries', `?select=total_amount,pieces${dateFilter}`),
+        supabaseFetch('materials', `?select=total_amount${dateFilter}`),
+        supabaseFetch('factory_expenses', `?select=amount,category${dateFilter}`),
+        supabaseFetch('staff_attendance', `?select=calculated_pay${dateFilter}`),
+        supabaseFetch('karigar_upad', `?select=amount${dateFilter}`),
+      ]);
+
+      const totalRevenue = lots.reduce((s, r) => s + (Number(r.total_amount) || 0), 0);
+      const totalPieces = lots.reduce((s, r) => s + (Number(r.total_pieces) || 0), 0);
+      const totalStitching = work.reduce((s, r) => s + (Number(r.total_amount) || 0), 0);
+      const kurtiPieces = work.reduce((s, r) => s + (Number(r.kurti_pieces) || 0), 0);
+      const pantPieces = work.reduce((s, r) => s + (Number(r.pant_pieces) || 0), 0);
+      const totalPress = press.reduce((s, r) => s + (Number(r.total_amount) || 0), 0);
+      const pressPieces = press.reduce((s, r) => s + (Number(r.pieces) || 0), 0);
+      const totalMaterials = mat.reduce((s, r) => s + (Number(r.total_amount) || 0), 0);
+      const totalOverheads = exp.reduce((s, r) => s + (Number(r.amount) || 0), 0);
+      const totalStaffPay = staffAtt.reduce((s, r) => s + (Number(r.calculated_pay) || 0), 0);
+      const totalUpad = upad.reduce((s, r) => s + (Number(r.amount) || 0), 0);
+
+      const totalExpense = totalStitching + totalPress + totalMaterials + totalOverheads + totalStaffPay;
+      const netProfit = totalRevenue - totalExpense;
+      const profitMargin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100).toFixed(1) : 0;
+
+      return {
+        revenue: { total: totalRevenue, pieces: totalPieces, lotCount: lots.length },
+        expenses: {
+          total: totalExpense,
+          stitching: totalStitching,
+          press: totalPress,
+          materials: totalMaterials,
+          overheads: totalOverheads,
+          staffSalary: totalStaffPay
+        },
+        profit: { netProfit, profitMargin: Number(profitMargin), isProfitable: netProfit >= 0 },
+        breakdown: { kurtiPieces, pantPieces, pressPieces, totalUpadPaid: totalUpad }
+      };
+    }
+
+    throw new Error('Endpoint not recognized');
+  } catch (err) {
+    console.error('API Error on', endpoint, err);
+    throw err;
+  }
 }
 
 // ===================================================================
@@ -177,13 +711,12 @@ const viewTitles = {
   materials: { title: 'મટીરીયલ્સ / કાચો માલ ખર્ચ', sub: 'દોરો, બટન, ઝિપ, ઇલાસ્ટિક, પેકિંગ બેગ વગેરે' },
   expenses: { title: 'કારખાના ખાતા ખર્ચ (Overheads)', sub: 'લાઈટ બિલ, કચરો, કારખાના ભાડું, પાણી બિલ, ચા-નાસ્તો' },
   staff: { title: 'ફિક્સ પગાર સ્ટાફ (Staff Register)', sub: 'કટિંગ, પેકિંગ, હેલ્પરની દૈનિક હાજરી અને કલાક હિસાબ' },
-  settings: { title: 'સેટિંગ્સ & મોબાઇલ કનેક્ટ', sub: 'કંપની વિગત, ડેટા બેકઅપ અને એન્ડ્રોઇડ એપ લિંક' },
+  settings: { title: 'સેટિંગ્સ & કનેક્ટ', sub: 'કંપની વિગત, ડેટા બેકઅપ અને એન્ડ્રોઇડ ક્લાઉડ સિંક' },
 };
 
 function switchTab(tabId) {
   currentTab = tabId;
 
-  // Update sidebar active class
   document.querySelectorAll('.nav-item').forEach(item => {
     item.classList.remove('active');
   });
@@ -192,23 +725,19 @@ function switchTab(tabId) {
   });
   if (activeNav) activeNav.classList.add('active');
 
-  // Toggle views
   document.querySelectorAll('.tab-view').forEach(view => {
     view.style.display = 'none';
   });
   const targetView = document.getElementById(`view-${tabId}`);
   if (targetView) targetView.style.display = 'block';
 
-  // Update Header title
   if (viewTitles[tabId]) {
     document.getElementById('pageTitle').textContent = viewTitles[tabId].title;
     document.getElementById('pageSubtitle').textContent = viewTitles[tabId].sub;
   }
 
-  // Close mobile sidebar if open
   document.getElementById('sidebar').classList.remove('open');
 
-  // Load specific tab data
   if (tabId === 'dashboard') loadDashboard();
   else if (tabId === 'lots') loadLots();
   else if (tabId === 'challans') loadChallans();
@@ -299,7 +828,6 @@ async function fetchDropdownMasters() {
 }
 
 function populateDropdowns() {
-  // Merchants
   const lotMerch = document.getElementById('lotMerchantSelect');
   if (lotMerch) {
     lotMerch.innerHTML = '<option value="">-- વેપારી પસંદ કરો --</option>' +
@@ -311,7 +839,6 @@ function populateDropdowns() {
       state.merchants.map(m => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('');
   }
 
-  // Designs
   const lotDes = document.getElementById('lotDesignSelect');
   if (lotDes) {
     lotDes.innerHTML = '<option value="">-- ડિઝાઇન પસંદ કરો --</option>' +
@@ -328,7 +855,6 @@ function populateDropdowns() {
       state.designs.map(d => `<option value="${d.id}" data-press="${d.press_rate}">${escapeHtml(d.design_no)} - ${escapeHtml(d.name || '')} (પ્રેસ ₹${d.press_rate})</option>`).join('');
   }
 
-  // Karigars
   const workKar = document.getElementById('workKarigarSelect');
   if (workKar) {
     workKar.innerHTML = '<option value="">-- કારીગર પસંદ કરો --</option>' +
@@ -345,21 +871,18 @@ function populateDropdowns() {
       state.karigars.map(k => `<option value="${k.id}">${escapeHtml(k.name)}</option>`).join('');
   }
 
-  // Press Vendors
   const pVen = document.getElementById('pressVendorSelect');
   if (pVen) {
     pVen.innerHTML = '<option value="">-- પ્રેસ વાળા પસંદ કરો --</option>' +
       state.pressVendors.map(v => `<option value="${v.id}" data-rate="${v.default_rate}">${escapeHtml(v.name)} (ડિફોલ્ટ ₹${v.default_rate})</option>`).join('');
   }
 
-  // Staff
   const attStaff = document.getElementById('attStaffSelect');
   if (attStaff) {
     attStaff.innerHTML = '<option value="">-- સ્ટાફ પસંદ કરો --</option>' +
       state.staff.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (${escapeHtml(s.role)})</option>`).join('');
   }
 
-  // Inward Lots for linking
   const workLot = document.getElementById('workLotSelect');
   if (workLot) {
     workLot.innerHTML = '<option value="">-- કોઈ લોટ નહીં (સ્વતંત્ર કામ) --</option>' +
@@ -394,7 +917,6 @@ async function loadDashboard() {
 
     const data = await api(url);
 
-    // Update Metric Cards
     document.getElementById('statRevenue').textContent = `₹${data.revenue.total.toLocaleString('en-IN')}`;
     document.getElementById('statPieces').textContent = `${data.revenue.pieces} પીસ • ${data.revenue.lotCount} લોટ`;
 
@@ -416,7 +938,6 @@ async function loadDashboard() {
     marginEl.textContent = `નફો: ${data.profit.profitMargin}% (ચોખ્ખો)`;
     marginEl.style.color = data.profit.isProfitable ? 'var(--emerald-700)' : 'var(--rose-700)';
 
-    // Load recent lots into Dashboard table
     const lots = await api('/api/lots');
     const tbody = document.querySelector('#dashboardLotsTable tbody');
     if (!lots || lots.length === 0) {
@@ -673,7 +1194,6 @@ async function loadKarigars() {
     renderKarigarWorkTable(work);
     renderKarigarUpadTable(upad);
 
-    // If a karigar is already selected in ledger, reload it
     const selectedKarigarId = document.getElementById('ledgerKarigarSelect')?.value;
     if (selectedKarigarId) {
       loadKarigarLedger(selectedKarigarId);
@@ -753,7 +1273,6 @@ async function loadKarigarLedger(karigarId) {
     document.getElementById('ledTotalUpad').textContent = `₹${data.summary.totalUpad.toLocaleString('en-IN')}`;
     document.getElementById('ledNetBalance').textContent = `₹${data.summary.netBalance.toLocaleString('en-IN')}`;
 
-    // Combine work and upad chronological items
     const entries = [];
     data.workEntries.forEach(w => {
       entries.push({
@@ -933,7 +1452,7 @@ async function printKarigarSalarySlip() {
       <div class="print-document">
         <div class="print-header">
           <div class="print-header-left">
-            <img src="/logo.png" class="print-logo" alt="Gurukrupa Logo">
+            <img src="./logo.png" class="print-logo" alt="Gurukrupa Logo">
             <div class="print-title">
               <h1>${escapeHtml(state.settings.company_name || 'GURUKRUPA CREATION')}</h1>
               <p>${escapeHtml(state.settings.company_tagline || 'Kurti - Pant Manufacturing & Jobwork')}</p>
@@ -1572,7 +2091,6 @@ function calcChallanTotals() {
 }
 
 function onChallanMerchantChange(merchantId) {
-  // Filter lot selector for this merchant
   const lotSelect = document.getElementById('challanLotSelect');
   const merchantLots = state.lots.filter(l => l.merchant_id == merchantId);
   lotSelect.innerHTML = '<option value="">-- સમગ્ર લોટ સિલેક્ટ કરો (ઓટો ભરવા માટે) --</option>' +
@@ -1648,7 +2166,6 @@ async function submitDeliveryChallan(e) {
     showToast('ચલણ બની ગયું! ઓટોમેટિક પ્રિન્ટ થઈ રહ્યું છે...', 'success');
     loadChallans();
     loadDashboard();
-    // Automatic Print
     if (res.id) {
       printChallanById(res.id);
     }
@@ -1667,7 +2184,7 @@ async function printChallanById(challanId) {
       <div class="print-document">
         <div class="print-header">
           <div class="print-header-left">
-            <img src="/logo.png" class="print-logo" alt="Gurukrupa Logo">
+            <img src="./logo.png" class="print-logo" alt="Gurukrupa Logo">
             <div class="print-title">
               <h1>${escapeHtml(state.settings.company_name || 'GURUKRUPA CREATION')}</h1>
               <p>${escapeHtml(state.settings.company_tagline || 'Kurti - Pant Manufacturing & Jobwork Specialist')}</p>
@@ -1754,14 +2271,13 @@ async function deleteChallan(id) {
 }
 
 // ===================================================================
-// MODULE 10: SETTINGS & BACKUP
+// MODULE 10: SETTINGS & CLOUD SYNC
 // ===================================================================
 async function loadSettings() {
   try {
     const s = await api('/api/settings');
     state.settings = s;
 
-    // Fill form
     const cn = document.getElementById('setCompanyName');
     if (cn) cn.value = s.company_name || 'GURUKRUPA CREATION';
     const ct = document.getElementById('setCompanyTagline');
@@ -1773,18 +2289,13 @@ async function loadSettings() {
     const cpr = document.getElementById('setChallanPrefix');
     if (cpr) cpr.value = s.challan_prefix || 'GK-CH-';
 
-    // Show network IP for Android connection
-    const ips = s.serverIps || [];
-    const mainIp = ips[0] || window.location.hostname;
-    const port = s.port || 4500;
-    const fullMobileUrl = `http://${mainIp}:${port}`;
-
+    const liveUrl = 'https://om2008buddy.github.io/girikrupa-creation/';
     const ipText = document.getElementById('serverIpText');
-    if (ipText) ipText.textContent = `Mobile: ${mainIp}:${port}`;
+    if (ipText) ipText.textContent = `Cloud: Supabase Active`;
 
     const androidUrlDisplay = document.getElementById('androidUrlDisplay');
     if (androidUrlDisplay) {
-      androidUrlDisplay.innerHTML = `<a href="${fullMobileUrl}" target="_blank" style="color:var(--sapphire-700);">${fullMobileUrl}</a>`;
+      androidUrlDisplay.innerHTML = `<a href="${liveUrl}" target="_blank" style="color:var(--sapphire-700); font-weight:700;">${liveUrl}</a>`;
     }
   } catch (err) {
     console.error('Error loading settings:', err);
@@ -1810,7 +2321,16 @@ async function saveCompanySettings(e) {
 }
 
 function downloadBackup() {
-  window.open('/api/backup/export', '_blank');
+  const backup = {
+    exported_at: new Date().toISOString(),
+    version: '1.0.0',
+    data: state
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `gurukrupa_backup_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
 }
 
 // ===================================================================
