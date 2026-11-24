@@ -30,6 +30,60 @@ let state = {
 };
 
 // ===================================================================
+// THEME & DISPLAY PREFERENCES
+// ===================================================================
+function initTheme() {
+  const saved = localStorage.getItem('gk_theme');
+  const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+  const theme = saved || (prefersLight ? 'light' : 'dark');
+  setTheme(theme);
+
+  // Restore collapsed sidebar if on desktop
+  if (window.innerWidth > 900 && localStorage.getItem('gk_sidebar_collapsed') === 'true') {
+    const sb = document.getElementById('sidebar');
+    if (sb) sb.classList.add('collapsed');
+  }
+}
+
+function toggleTheme() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  setTheme(isLight ? 'dark' : 'light');
+}
+
+function setTheme(theme) {
+  if (theme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    localStorage.setItem('gk_theme', 'light');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('gk_theme', 'dark');
+  }
+  updateThemeUI(theme);
+}
+
+function updateThemeUI(theme) {
+  const text = document.getElementById('themeText');
+  const icon = document.getElementById('themeIconDark');
+  if (text) text.textContent = theme === 'light' ? 'ડાર્ક મોડ' : 'લાઇટ મોડ';
+  if (icon) {
+    if (theme === 'light') {
+      icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>';
+    } else {
+      icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>';
+    }
+  }
+}
+
+function toggleSidebarCollapse() {
+  const sb = document.getElementById('sidebar');
+  if (!sb) return;
+  const isCollapsed = sb.classList.toggle('collapsed');
+  localStorage.setItem('gk_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+  const collapseText = document.querySelector('.collapse-text');
+  if (collapseText) collapseText.textContent = isCollapsed ? 'વિસ્તારો' : 'સંકોચો';
+}
+
+// ===================================================================
 // AUTHENTICATION & PASSCODE GATE (6390)
 // ===================================================================
 function enterPin(digit) {
@@ -67,8 +121,20 @@ async function verifyPasscode() {
   if (currentPin === APP_PASSCODE) {
     authToken = 'gk_authenticated_session';
     localStorage.setItem('gk_auth_token', authToken);
-    unlockApp();
-    showToast('સફળ પ્રવેશ! સ્વાગત છે.', 'success');
+    
+    // Success feedback
+    const pinDots = document.getElementById('pinDots');
+    if (pinDots) pinDots.classList.add('success');
+    
+    const lockScreen = document.getElementById('lockScreen');
+    if (lockScreen) lockScreen.classList.add('unlocking');
+
+    setTimeout(() => {
+      unlockApp();
+      if (pinDots) pinDots.classList.remove('success');
+      if (lockScreen) lockScreen.classList.remove('unlocking');
+      showToast('સફળ પ્રવેશ! સ્વાગત છે.', 'success');
+    }, 350);
   } else {
     handlePinError();
   }
@@ -76,10 +142,18 @@ async function verifyPasscode() {
 
 function handlePinError() {
   const card = document.getElementById('lockCard');
-  card.classList.add('shake-animation');
+  const pinDots = document.getElementById('pinDots');
+  if (card) card.classList.add('shake-animation');
+  if (pinDots) pinDots.classList.add('error');
+  
+  if (navigator.vibrate) {
+    navigator.vibrate([40, 30, 40]);
+  }
+  
   showToast('ખોટો પાસવર્ડ! કૃપા કરીને 6390 દાખલ કરો.', 'error');
   setTimeout(() => {
-    card.classList.remove('shake-animation');
+    if (card) card.classList.remove('shake-animation');
+    if (pinDots) pinDots.classList.remove('error');
     clearPin();
   }, 400);
 }
@@ -111,12 +185,23 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-// Check existing session
+// Check existing session & setup UI
 window.addEventListener('DOMContentLoaded', () => {
+  initTheme();
+
   const today = new Date().toISOString().split('T')[0];
   document.querySelectorAll('input[type="date"]').forEach(inp => {
     if (!inp.value) inp.value = today;
   });
+
+  // Topbar scroll shadow listener
+  window.addEventListener('scroll', () => {
+    const topbar = document.getElementById('appTopbar');
+    if (topbar) {
+      if (window.scrollY > 10) topbar.classList.add('scrolled');
+      else topbar.classList.remove('scrolled');
+    }
+  }, { passive: true });
 
   if (authToken) {
     unlockApp();
@@ -725,6 +810,15 @@ function switchTab(tabId) {
   });
   if (activeNav) activeNav.classList.add('active');
 
+  // Sync mobile bottom navigation bar active button
+  document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+    if (btn.getAttribute('data-tab') === tabId) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
   document.querySelectorAll('.tab-view').forEach(view => {
     view.style.display = 'none';
   });
@@ -736,6 +830,7 @@ function switchTab(tabId) {
     document.getElementById('pageSubtitle').textContent = viewTitles[tabId].sub;
   }
 
+  window.scrollTo({ top: 0, behavior: 'smooth' });
   closeSidebar();
 
   if (tabId === 'dashboard') loadDashboard();
@@ -936,6 +1031,32 @@ function populateDropdowns() {
 // ===================================================================
 // MODULE 1: DASHBOARD & PNL ENGINE (Point 8)
 // ===================================================================
+function countUp(el, targetNumber, prefix = '₹') {
+  if (!el) return;
+  const num = Number(targetNumber) || 0;
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (prefersReduced) {
+    el.textContent = `${prefix}${num.toLocaleString('en-IN')}`;
+    return;
+  }
+  const duration = 400;
+  const startTime = performance.now();
+  const startVal = 0;
+  function tick(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(startVal + (num - startVal) * ease);
+    el.textContent = `${prefix}${current.toLocaleString('en-IN')}`;
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      el.textContent = `${prefix}${num.toLocaleString('en-IN')}`;
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
 async function loadDashboard() {
   try {
     let url = '/api/analytics/pnl';
@@ -955,31 +1076,31 @@ async function loadDashboard() {
 
     const data = await api(url);
 
-    document.getElementById('statRevenue').textContent = `₹${data.revenue.total.toLocaleString('en-IN')}`;
-    document.getElementById('statPieces').textContent = `${data.revenue.pieces} પીસ • ${data.revenue.lotCount} લોટ`;
+    countUp(document.getElementById('statRevenue'), data.revenue.total);
+    document.getElementById('statPieces').textContent = `${data.revenue.pieces.toLocaleString('en-IN')} પીસ • ${data.revenue.lotCount} લોટ`;
 
-    document.getElementById('statStitching').textContent = `₹${data.expenses.stitching.toLocaleString('en-IN')}`;
-    document.getElementById('statKurtiPantPcs').textContent = `કુર્તી: ${data.breakdown.kurtiPieces} • પેન્ટ: ${data.breakdown.pantPieces}`;
+    countUp(document.getElementById('statStitching'), data.expenses.stitching);
+    document.getElementById('statKurtiPantPcs').textContent = `કુર્તી: ${data.breakdown.kurtiPieces.toLocaleString('en-IN')} • પેન્ટ: ${data.breakdown.pantPieces.toLocaleString('en-IN')}`;
 
-    document.getElementById('statPress').textContent = `₹${data.expenses.press.toLocaleString('en-IN')}`;
-    document.getElementById('statPressPcs').textContent = `${data.breakdown.pressPieces} પીસ પ્રેસ થયા`;
+    countUp(document.getElementById('statPress'), data.expenses.press);
+    document.getElementById('statPressPcs').textContent = `${data.breakdown.pressPieces.toLocaleString('en-IN')} પીસ પ્રેસ થયા`;
 
-    document.getElementById('statMaterials').textContent = `₹${data.expenses.materials.toLocaleString('en-IN')}`;
-    document.getElementById('statOverheads').textContent = `₹${data.expenses.overheads.toLocaleString('en-IN')}`;
+    countUp(document.getElementById('statMaterials'), data.expenses.materials);
+    countUp(document.getElementById('statOverheads'), data.expenses.overheads);
     document.getElementById('statStaffSalary').textContent = `સ્ટાફ પગાર: ₹${data.expenses.staffSalary.toLocaleString('en-IN')}`;
 
     const netProfitEl = document.getElementById('statNetProfit');
-    netProfitEl.textContent = `₹${data.profit.netProfit.toLocaleString('en-IN')}`;
-    netProfitEl.style.color = data.profit.isProfitable ? 'var(--emerald-600)' : 'var(--rose-600)';
+    countUp(netProfitEl, data.profit.netProfit);
+    netProfitEl.style.color = data.profit.isProfitable ? 'var(--success)' : 'var(--danger)';
 
     const marginEl = document.getElementById('statProfitMargin');
     marginEl.textContent = `નફો: ${data.profit.profitMargin}% (ચોખ્ખો)`;
-    marginEl.style.color = data.profit.isProfitable ? 'var(--emerald-700)' : 'var(--rose-700)';
+    marginEl.style.color = data.profit.isProfitable ? 'var(--success)' : 'var(--danger)';
 
     const lots = await api('/api/lots');
     const tbody = document.querySelector('#dashboardLotsTable tbody');
     if (!lots || lots.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 30px; color: var(--slate-400);">હજુ સુધી કોઈ માલ નોંધાયેલ નથી. "+ નવો માલ ઉમેરો" પર ક્લિક કરો.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 30px; color: var(--text-faint);">હજુ સુધી કોઈ માલ નોંધાયેલ નથી. "+ નવો માલ ઉમેરો" પર ક્લિક કરો.</td></tr>`;
     } else {
       tbody.innerHTML = lots.slice(0, 5).map(l => `
         <tr>

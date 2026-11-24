@@ -2,18 +2,38 @@
 <html lang="gu">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>ગુરુકૃપા ક્રિએશન | Gurukrupa Creation</title>
   
+  <!-- Theme Init Script (Zero Flash of Wrong Theme) -->
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('gk_theme');
+        if (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+          t = 'light';
+        }
+        if (t === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      } catch (e) {}
+    })();
+  </script>
+
   <!-- Favicon & PWA -->
   <link rel="icon" type="image/png" href="./logo.png">
   <link rel="apple-touch-icon" href="./logo.png">
   <link rel="manifest" href="./manifest.json">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#0b1020">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-  <link rel="stylesheet" href="./styles.css?v=2.5">
+  <!-- Google Fonts: Noto Sans Gujarati & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Gujarati:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./styles.css?v=3.0">
 </head>
 <body>
 
@@ -21,7 +41,7 @@
   <div class="ambient-bg"></div>
 
   <!-- ===================================================================
-       PASSCODE GATE MODAL (PIN: 6390)
+       PASSCODE GATE MODAL (PIN: 6390) - VAULT FIRST IMPRESSION
        =================================================================== -->
   <div id="lockScreen" class="lock-screen-wrapper">
     <div class="lock-card" id="lockCard">
@@ -29,7 +49,7 @@
         <img src="./logo.png" alt="Gurukrupa Logo">
       </div>
       <h2 class="lock-title">ગુરુકૃપા ક્રિએશન</h2>
-      <p class="lock-sub">એપ શરૂ કરવા માટે પાસકોડ દાખલ કરો</p>
+      <p class="lock-sub">Gurukrupa Creation • Private Vault</p>
 
       <div class="pin-dots" id="pinDots">
         <div class="pin-dot"></div>
@@ -39,18 +59,22 @@
       </div>
 
       <div class="numpad-grid">
-        <button class="num-btn" onclick="enterPin('1')">1</button>
-        <button class="num-btn" onclick="enterPin('2')">2</button>
-        <button class="num-btn" onclick="enterPin('3')">3</button>
-        <button class="num-btn" onclick="enterPin('4')">4</button>
-        <button class="num-btn" onclick="enterPin('5')">5</button>
-        <button class="num-btn" onclick="enterPin('6')">6</button>
-        <button class="num-btn" onclick="enterPin('7')">7</button>
-        <button class="num-btn" onclick="enterPin('8')">8</button>
-        <button class="num-btn" onclick="enterPin('9')">9</button>
-        <button class="num-btn action" onclick="clearPin()">C</button>
-        <button class="num-btn" onclick="enterPin('0')">0</button>
-        <button class="num-btn action" onclick="deletePin()">⌫</button>
+        <button type="button" class="num-btn" onclick="enterPin('1')">1</button>
+        <button type="button" class="num-btn" onclick="enterPin('2')">2</button>
+        <button type="button" class="num-btn" onclick="enterPin('3')">3</button>
+        <button type="button" class="num-btn" onclick="enterPin('4')">4</button>
+        <button type="button" class="num-btn" onclick="enterPin('5')">5</button>
+        <button type="button" class="num-btn" onclick="enterPin('6')">6</button>
+        <button type="button" class="num-btn" onclick="enterPin('7')">7</button>
+        <button type="button" class="num-btn" onclick="enterPin('8')">8</button>
+        <button type="button" class="num-btn" onclick="enterPin('9')">9</button>
+        <button type="button" class="num-btn action" onclick="clearPin()" title="Clear">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </button>
+        <button type="button" class="num-btn" onclick="enterPin('0')">0</button>
+        <button type="button" class="num-btn action" onclick="deletePin()" title="Backspace">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414-6.414a2 2 0 011.414-.586H19a2 2 0 012 2v10a2 2 0 01-2 2h-8.172a2 2 0 01-1.414-.586L3 12z"/></svg>
+        </button>
       </div>
     </div>
   </div>
@@ -68,7 +92,7 @@
         </div>
         <div class="brand-info">
           <h1>ગુરુકૃપા ક્રિએશન</h1>
-          <p>Gurukrupa Creation</p>
+          <p>GURUKRUPA CREATION</p>
         </div>
       </div>
 
@@ -76,62 +100,74 @@
         <div class="nav-section-title">મુખ્ય મેનૂ</div>
         <a class="nav-item active" onclick="switchTab('dashboard')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-          ડેશબોર્ડ & નફો
+          <span class="nav-item-text">ડેશબોર્ડ & નફો</span>
         </a>
         <a class="nav-item" onclick="switchTab('lots')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-          વેપારી આવેલ માલ
+          <span class="nav-item-text">વેપારી આવેલ માલ</span>
         </a>
         <a class="nav-item" onclick="switchTab('challans')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-          વેપારી માલ ચલણ
+          <span class="nav-item-text">વેપારી માલ ચલણ</span>
         </a>
 
         <div class="nav-section-title">કારીગર & ઉત્પાદન</div>
         <a class="nav-item" onclick="switchTab('karigars')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-          કારીગર કામ & ઉપાડ
+          <span class="nav-item-text">કારીગર કામ & ઉપાડ</span>
         </a>
         <a class="nav-item" onclick="switchTab('designs')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
-          ડિઝાઇન કેટલોગ
+          <span class="nav-item-text">ડિઝાઇન કેટલોગ</span>
         </a>
         <a class="nav-item" onclick="switchTab('press')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-          પ્રેસ હિસાબ
+          <span class="nav-item-text">પ્રેસ હિસાબ</span>
         </a>
 
         <div class="nav-section-title">ખર્ચ & સ્ટાફ</div>
         <a class="nav-item" onclick="switchTab('materials')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
-          મટીરીયલ્સ ખર્ચ
+          <span class="nav-item-text">મટીરીયલ્સ ખર્ચ</span>
         </a>
         <a class="nav-item" onclick="switchTab('expenses')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          ખાતા ખર્ચ (ભાડું/લાઈટ/પાણી)
+          <span class="nav-item-text">ખાતા ખર્ચ (ભાડું/લાઈટ/પાણી)</span>
         </a>
         <a class="nav-item" onclick="switchTab('staff')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          ફિક્સ પગાર સ્ટાફ
+          <span class="nav-item-text">ફિક્સ પગાર સ્ટાફ</span>
         </a>
         <a class="nav-item" onclick="openKarigarList()">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
-          કારીગર લિસ્ટ
+          <span class="nav-item-text">કારીગર લિસ્ટ</span>
         </a>
 
         <div class="nav-section-title">સિસ્ટમ</div>
         <a class="nav-item" onclick="switchTab('settings')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-          સેટિંગ્સ & બેકઅપ
+          <span class="nav-item-text">સેટિંગ્સ & બેકઅપ</span>
         </a>
       </nav>
 
       <div class="sidebar-footer">
-        <button class="lock-btn" onclick="lockApp()">
-          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-          લોક કરો
-        </button>
-        <span style="font-size: 11px; color: var(--slate-500);">v1.0 • GK</span>
+        <div class="sidebar-footer-row">
+          <button class="footer-btn theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="થીમ બદલો (Dark/Light)">
+            <svg id="themeIconDark" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <span class="sidebar-footer-labels" id="themeText">લાઇટ મોડ</span>
+          </button>
+          <button class="footer-btn lock-btn" onclick="lockApp()" title="એપ લોક કરો">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <span class="sidebar-footer-labels">લોક</span>
+          </button>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 2px 4px;">
+          <span style="font-size: 11px; color: var(--text-faint);" class="sidebar-footer-labels">v1.0 • GK</span>
+          <button class="footer-btn" onclick="toggleSidebarCollapse()" title="સંકોચો/વિસ્તારો" style="padding: 3px 6px; font-size: 10px;">
+            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+            <span class="collapse-text">સંકોચો</span>
+          </button>
+        </div>
       </div>
     </aside>
 
@@ -142,9 +178,9 @@
     <div class="main-wrapper">
       
       <!-- Topbar Header -->
-      <header class="topbar">
+      <header class="topbar" id="appTopbar">
         <div class="topbar-left">
-          <button class="mobile-menu-btn" onclick="toggleSidebar()">
+          <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Open navigation menu">
             <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
           <div class="page-title-wrap">
@@ -153,7 +189,9 @@
           </div>
         </div>
 
-        <div class="topbar-right"></div>
+        <div class="topbar-right">
+          <!-- Topbar actions if needed -->
+        </div>
       </header>
 
       <!-- Content Views -->
@@ -164,21 +202,35 @@
              ========================================== -->
         <section id="view-dashboard" class="tab-view">
           
-          <!-- Date Filter Header -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="btn btn-sm btn-outline active-filter" onclick="filterDashboard('all', this)">બધો સમય (All)</button>
-              <button class="btn btn-sm btn-outline" onclick="filterDashboard('month', this)">આ મહિને</button>
-              <button class="btn btn-sm btn-outline" onclick="filterDashboard('week', this)">આ અઠવાડિયે</button>
-              <button class="btn btn-sm btn-outline" onclick="filterDashboard('today', this)">આજે</button>
+          <!-- Period Filter Header & Actions -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; flex-wrap: wrap; gap: 14px;">
+            <div class="segmented-control" id="dashboardSegmentedControl">
+              <button type="button" class="btn btn-sm active-filter" onclick="filterDashboard('all', this)">બધો સમય (All)</button>
+              <button type="button" class="btn btn-sm" onclick="filterDashboard('month', this)">આ મહિને</button>
+              <button type="button" class="btn btn-sm" onclick="filterDashboard('week', this)">આ અઠવાડિયે</button>
+              <button type="button" class="btn btn-sm" onclick="filterDashboard('today', this)">આજે</button>
             </div>
             <div style="display: flex; gap: 10px;">
-              <button class="btn btn-primary" onclick="openModal('modal-add-lot')">+ નવો માલ ઉમેરો</button>
-              <button class="btn btn-success" onclick="openModal('modal-add-challan')">+ ચલણ બનાવો</button>
+              <button type="button" class="btn btn-primary" onclick="openModal('modal-add-lot')">+ નવો માલ ઉમેરો</button>
+              <button type="button" class="btn btn-success" onclick="openModal('modal-add-challan')">+ ચલણ બનાવો</button>
             </div>
           </div>
 
-          <!-- Financial Statistics Grid (Point 8) -->
+          <!-- Hero Net Profit Card (Flagship Centerpiece) -->
+          <div class="hero-profit-card" style="margin-bottom: 20px;">
+            <div class="hero-profit-left">
+              <span class="hero-profit-title">ચોખ્ખો વાસ્તવિક નફો (NET PROFIT)</span>
+              <h3 class="hero-profit-value" id="statNetProfit">₹0</h3>
+              <div class="hero-profit-pill" id="statProfitMargin">નફો: 0% (ચોખ્ખો)</div>
+            </div>
+            <div class="hero-profit-right">
+              <div class="hero-profit-icon-wrap">
+                <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Financial Statistics Secondary Grid (Points 1, 2, 5, 6, 7) -->
           <div class="stats-grid">
             <div class="stat-card revenue">
               <div class="stat-meta">
@@ -232,17 +284,6 @@
               </div>
               <div class="stat-icon">
                 <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-              </div>
-            </div>
-
-            <div class="stat-card profit">
-              <div class="stat-meta">
-                <p>ચોખ્ખો નફો (NET PROFIT)</p>
-                <h3 id="statNetProfit" style="color: var(--emerald-600);">₹0</h3>
-                <span class="sub-info" id="statProfitMargin" style="font-weight: 700; color: var(--emerald-700);">નફો: 0%</span>
-              </div>
-              <div class="stat-icon">
-                <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
               </div>
             </div>
           </div>
@@ -1464,6 +1505,34 @@
   <div id="printableArea">
     <!-- Populated dynamically and printed via window.print() -->
   </div>
+
+  <!-- ===================================================================
+       MOBILE BOTTOM NAVIGATION BAR (Fixed quick-access bar)
+       =================================================================== -->
+  <nav class="mobile-bottom-bar" id="mobileBottomBar" aria-label="Mobile Bottom Navigation">
+    <div class="mobile-bottom-nav">
+      <button type="button" class="mobile-nav-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span>ડેશબોર્ડ</span>
+      </button>
+      <button type="button" class="mobile-nav-btn" data-tab="lots" onclick="switchTab('lots')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        <span>માલ</span>
+      </button>
+      <button type="button" class="mobile-nav-btn" data-tab="karigars" onclick="switchTab('karigars')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        <span>કારીગર</span>
+      </button>
+      <button type="button" class="mobile-nav-btn" data-tab="expenses" onclick="switchTab('expenses')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>ખાતા ખર્ચ</span>
+      </button>
+      <button type="button" class="mobile-nav-btn" onclick="toggleSidebar()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <span>મેનૂ</span>
+      </button>
+    </div>
+  </nav>
 
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toastContainer"></div>
