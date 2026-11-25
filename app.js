@@ -680,8 +680,14 @@ async function api(endpoint, options = {}) {
           totalPieces += Number(item.pieces) || 0;
           grandTotal += (Number(item.pieces) || 0) * (Number(item.rate) || 0);
         }
+        // Sequential bill number: count all existing challans, next = count + 1
         const prefix = state.settings.challan_prefix || 'GK-CH-';
-        const challan_no = body.challan_no || `${prefix}${Date.now().toString().slice(-6)}`;
+        let challan_no = body.challan_no;
+        if (!challan_no) {
+          const existing = await supabaseFetch('delivery_challans', '?select=id');
+          const nextNum = (existing.length || 0) + 1;
+          challan_no = `${prefix}${nextNum}`;
+        }
 
         const rows = await supabaseFetch('delivery_challans', '', {
           method: 'POST',
