@@ -614,6 +614,21 @@ body {
   gap: 8px;
 }
 
+.sidebar-watermark {
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  opacity: 0.38;
+  user-select: none;
+  pointer-events: none;
+  font-style: italic;
+  padding-top: 2px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.sidebar.collapsed .sidebar-watermark { display: none; }
+
 .footer-btn {
   display: inline-flex;
   align-items: center;
