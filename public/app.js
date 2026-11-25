@@ -2498,6 +2498,218 @@ function downloadBackup() {
   a.click();
 }
 
+// ─── PDF / Print Full Report ───────────────────────────────────────────────
+function downloadBackupPDF() {
+  const s = state;
+  const dateStr = new Date().toLocaleDateString('en-IN');
+  const co = s.settings || {};
+  const companyName = co.company_name || 'ગુરુકૃપા ક્રિએશન';
+
+  const fmt = (n) => Number(n || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // ── Helpers ──
+  const sectionHead = (title) => `
+    <tr><td colspan="20" style="background:#222;color:#fff;font-weight:700;font-size:13px;padding:8px 10px;border:1px solid #000;">${title}</td></tr>`;
+
+  const tableHead = (cols) => `
+    <tr>${cols.map(c => `<th style="background:#e0e0e0;border:1px solid #000;padding:5px 7px;font-size:10px;font-weight:700;">${c}</th>`).join('')}</tr>`;
+
+  const noData = (cols) => `<tr><td colspan="${cols}" style="border:1px solid #000;padding:5px 7px;font-size:10px;color:#666;text-align:center;">— કોઈ ડેટા નથી —</td></tr>`;
+
+  // ── 1. Traders ──
+  const tradersRows = (s.merchants || []).map((m, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${m.name || '-'}</td><td>${m.phone || '-'}</td><td>${m.address || '-'}</td>
+    </tr>`).join('') || noData(4);
+
+  // ── 2. Inward Lots ──
+  const lotsRows = (s.lots || []).map((l, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${l.lot_no || '-'}</td><td>${l.lot_name || '-'}</td>
+      <td>${l.merchant_name || '-'}</td><td>${l.pieces || 0}</td>
+      <td>₹${fmt(l.rate)}</td><td>₹${fmt(l.total_amount)}</td>
+      <td>${l.date || '-'}</td><td>${l.status || '-'}</td>
+    </tr>`).join('') || noData(9);
+
+  // ── 3. Challans ──
+  const challansRows = (s.challans || []).map((c, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${c.challan_no || '-'}</td><td>${c.merchant_name || '-'}</td>
+      <td>${c.total_pieces || 0}</td><td>₹${fmt(c.grand_total)}</td>
+      <td>${c.date || '-'}</td><td>${c.status || '-'}</td>
+    </tr>`).join('') || noData(7);
+
+  // ── 4. Artisan Work ──
+  const workRows = (s.karigarWork || []).map((w, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${w.karigar_name || '-'}</td><td>${w.lot_name || '-'}</td>
+      <td>${w.pieces || 0}</td><td>₹${fmt(w.rate)}</td><td>₹${fmt(w.amount)}</td>
+      <td>${w.date || '-'}</td>
+    </tr>`).join('') || noData(7);
+
+  // ── 5. Artisan Advances ──
+  const advRows = (s.karigarUpad || []).map((a, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${a.karigar_name || '-'}</td><td>₹${fmt(a.amount)}</td>
+      <td>${a.note || '-'}</td><td>${a.date || '-'}</td>
+    </tr>`).join('') || noData(5);
+
+  // ── 6. Artisan List ──
+  const karigarRows = (s.karigars || []).map((k, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${k.name || '-'}</td><td>${k.phone || '-'}</td><td>${k.address || '-'}</td>
+    </tr>`).join('') || noData(4);
+
+  // ── 7. Designs ──
+  const designRows = (s.designs || []).map((d, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${d.design_no || '-'}</td><td>${d.design_name || '-'}</td>
+      <td>${d.type || '-'}</td><td>₹${fmt(d.kurti_rate)}</td><td>₹${fmt(d.pant_rate)}</td>
+      <td>${d.total_pieces || 0}</td>
+    </tr>`).join('') || noData(7);
+
+  // ── 8. Press Entries ──
+  const pressRows = (s.pressEntries || []).map((p, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${p.vendor_name || '-'}</td><td>${p.design_no || '-'}</td>
+      <td>${p.type || '-'}</td><td>${p.pieces || 0}</td>
+      <td>₹${fmt(p.rate)}</td><td>₹${fmt(p.total)}</td><td>${p.date || '-'}</td>
+    </tr>`).join('') || noData(8);
+
+  // ── 9. Materials ──
+  const matRows = (s.materials || []).map((m, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${m.item_name || '-'}</td><td>${m.vendor || '-'}</td>
+      <td>${m.quantity || '-'}</td><td>₹${fmt(m.amount)}</td>
+      <td>${m.bill_no || '-'}</td><td>${m.date || '-'}</td>
+    </tr>`).join('') || noData(7);
+
+  // ── 10. Expenses ──
+  const expRows = (s.expenses || []).map((e, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${e.category || '-'}</td><td>${e.description || '-'}</td>
+      <td>₹${fmt(e.amount)}</td><td>${e.date || '-'}</td>
+    </tr>`).join('') || noData(5);
+
+  // ── 11. Staff ──
+  const staffRows = (s.staff || []).map((st, i) => `
+    <tr>
+      <td>${i + 1}</td><td>${st.name || '-'}</td><td>${st.role || '-'}</td>
+      <td>₹${fmt(st.salary)}</td><td>${st.phone || '-'}</td>
+    </tr>`).join('') || noData(5);
+
+  // ── Summary Totals ──
+  const totalRevenue = (s.lots || []).reduce((a, l) => a + (Number(l.total_amount) || 0), 0);
+  const totalArtisan = (s.karigarWork || []).reduce((a, w) => a + (Number(w.amount) || 0), 0);
+  const totalPress   = (s.pressEntries || []).reduce((a, p) => a + (Number(p.total) || 0), 0);
+  const totalMat     = (s.materials || []).reduce((a, m) => a + (Number(m.amount) || 0), 0);
+  const totalExp     = (s.expenses || []).reduce((a, e) => a + (Number(e.amount) || 0), 0);
+  const netProfit    = totalRevenue - totalArtisan - totalPress - totalMat - totalExp;
+
+  const html = `<!DOCTYPE html>
+<html lang="gu">
+<head>
+  <meta charset="UTF-8">
+  <title>ગુરુકૃપા ક્રિએશન — સંપૂર્ણ ડેટા રિપોર્ટ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Noto Sans Gujarati','Inter',Arial,sans-serif; font-size: 11px; color: #000; background: #fff; }
+    h1 { font-size: 20px; font-weight: 700; }
+    h2 { font-size: 13px; font-weight: 700; margin: 18px 0 6px; border-bottom: 1.5px solid #000; padding-bottom: 4px; }
+    .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 14px; }
+    .header-left p { font-size: 11px; color: #444; margin-top: 2px; }
+    .header-right { text-align: right; font-size: 11px; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin: 12px 0 18px; }
+    .summary-box { border: 1px solid #aaa; padding: 8px 10px; border-radius: 4px; }
+    .summary-box .label { font-size: 10px; color: #555; }
+    .summary-box .value { font-size: 14px; font-weight: 700; margin-top: 2px; }
+    .summary-box.profit .value { color: #1a7a40; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+    td, th { border: 1px solid #000; padding: 4px 6px; font-size: 10px; }
+    th { background: #ddd; font-weight: 700; }
+    tr:nth-child(even) td { background: #f5f5f5; }
+    .footer { margin-top: 20px; border-top: 1px solid #000; padding-top: 8px; display: flex; justify-content: space-between; font-size: 10px; color: #555; }
+    @page { size: A4 portrait; margin: 12mm 10mm; }
+    @media print {
+      body { font-size: 10px; }
+      h2 { page-break-before: auto; }
+      table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-left">
+      <h1>${companyName}</h1>
+      <p>Kurti - Pant Manufacturing &amp; Jobwork Specialist</p>
+      <p>સંપૂર્ણ ડેટા બેકઅપ રિપોર્ટ</p>
+    </div>
+    <div class="header-right">
+      <strong>રિપોર્ટ તારીખ:</strong> ${dateStr}<br>
+      <strong>કુલ વ્યાપારીઓ:</strong> ${(s.merchants||[]).length}<br>
+      <strong>કુલ ચલણ:</strong> ${(s.challans||[]).length}<br>
+      <strong>કુલ કારીગર:</strong> ${(s.karigars||[]).length}
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-box"><div class="label">કુલ આવક (Revenue)</div><div class="value">₹${fmt(totalRevenue)}</div></div>
+    <div class="summary-box"><div class="label">કારીગર ખર્ચ</div><div class="value">₹${fmt(totalArtisan)}</div></div>
+    <div class="summary-box"><div class="label">પ્રેસ ખર્ચ</div><div class="value">₹${fmt(totalPress)}</div></div>
+    <div class="summary-box"><div class="label">મટીરિયલ ખર્ચ</div><div class="value">₹${fmt(totalMat)}</div></div>
+    <div class="summary-box"><div class="label">અન્ય ખર્ચ</div><div class="value">₹${fmt(totalExp)}</div></div>
+    <div class="summary-box profit"><div class="label">ચોખ્ખો નફો (Net Profit)</div><div class="value">${netProfit >= 0 ? '+' : ''}₹${fmt(netProfit)}</div></div>
+  </div>
+
+  <h2>1. વ્યાપારી યાદી (Traders)</h2>
+  <table><thead>${tableHead(['ક્રમ','નામ','ફોન','સરનામું'])}</thead><tbody>${tradersRows}</tbody></table>
+
+  <h2>2. ઇનવર્ડ લોટ (Inward Lots)</h2>
+  <table><thead>${tableHead(['ક્રમ','લોટ નં.','નામ','વ્યાપારી','પીસ','ભાવ','કુલ','તારીખ','સ્ટેટસ'])}</thead><tbody>${lotsRows}</tbody></table>
+
+  <h2>3. ડિલિવરી ચલણ (Delivery Challans)</h2>
+  <table><thead>${tableHead(['ક્રમ','ચલણ નં.','વ્યાપારી','પીસ','કુલ','તારીખ','સ્ટેટસ'])}</thead><tbody>${challansRows}</tbody></table>
+
+  <h2>4. કારીગર કામ (Artisan Work)</h2>
+  <table><thead>${tableHead(['ક્રમ','કારીગર','લોટ','પીસ','ભાવ','રકમ','તારીખ'])}</thead><tbody>${workRows}</tbody></table>
+
+  <h2>5. કારીગર ઉચ્ચક / ઉપાડ (Advances)</h2>
+  <table><thead>${tableHead(['ક્રમ','કારીગર','રકમ','નોંધ','તારીખ'])}</thead><tbody>${advRows}</tbody></table>
+
+  <h2>6. કારીગર યાદી (Artisan List)</h2>
+  <table><thead>${tableHead(['ક્રમ','નામ','ફોન','સરનામું'])}</thead><tbody>${karigarRows}</tbody></table>
+
+  <h2>7. ડિઝાઇન કેટેલોગ (Design Catalog)</h2>
+  <table><thead>${tableHead(['ક્રમ','ડિઝ. નં.','નામ','પ્રકાર','કુર્તી ભાવ','પેન્ટ ભાવ','કુલ પીસ'])}</thead><tbody>${designRows}</tbody></table>
+
+  <h2>8. પ્રેસ હિસાબ (Press Accounts)</h2>
+  <table><thead>${tableHead(['ક્રમ','વ્યક્તિ','ડિઝ. નં.','પ્રકાર','પીસ','ભાવ','કુલ','તારીખ'])}</thead><tbody>${pressRows}</tbody></table>
+
+  <h2>9. મટીરિયલ ખર્ચ (Materials)</h2>
+  <table><thead>${tableHead(['ક્રમ','વસ્તુ','વ્યાપારી','જથ્થો','રકમ','બિલ નં.','તારીખ'])}</thead><tbody>${matRows}</tbody></table>
+
+  <h2>10. ખાતા ખર્ચ (Account Expenses)</h2>
+  <table><thead>${tableHead(['ક્રમ','વિભાગ','વિગત','રકમ','તારીખ'])}</thead><tbody>${expRows}</tbody></table>
+
+  <h2>11. ફિક્સ પગાર સ્ટાફ (Fixed Salary Staff)</h2>
+  <table><thead>${tableHead(['ક્રમ','નામ','હોદ્દો','પગાર','ફોન'])}</thead><tbody>${staffRows}</tbody></table>
+
+  <div class="footer">
+    <span>ગુરુકૃપા ક્રિએશન — સ્વ-ઉત્પન્ન રિપોર્ટ</span>
+    <span>By Om Parmar and Company</span>
+    <span>તારીખ: ${dateStr}</span>
+  </div>
+</body>
+</html>`;
+
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.onload = () => { win.focus(); win.print(); };
+}
+
 // ===================================================================
 // UTILITY FUNCTIONS
 // ===================================================================
