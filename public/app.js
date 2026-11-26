@@ -5,6 +5,9 @@
 const APP_PASSCODE = '6390';
 const SUPABASE_URL = 'https://vlzcckwtufnqfqdwblgk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_J7FK-c4VtzqWUGAImyj6_w_e9G4GQwd';
+const DEFAULT_COMPANY_TAGLINE = 'Kurti Pant Manufacturer & Wholesaler';
+const DEFAULT_COMPANY_PHONE = 'Solanki Rajnikant: 9427009253 | Vaghela Dilipbhai: 99790 50582';
+const DEFAULT_COMPANY_ADDRESS = '157, 2nd Floor, Gayatri Society, Near Rachna Circle, Surat.';
 
 let currentPin = '';
 let authToken = '';
@@ -1861,8 +1864,9 @@ async function printKarigarSalarySlip() {
             <img src="./logo.png" class="print-logo" alt="Gurukrupa Logo">
             <div class="print-title">
               <h1>${escapeHtml(state.settings.company_name || 'GURUKRUPA CREATION')}</h1>
-              <p>${escapeHtml(state.settings.company_tagline || 'Kurti - Pant Manufacturing & Jobwork')}</p>
-              <p>મોબાઇલ: ${escapeHtml(state.settings.company_phone || '')}</p>
+              <p>${escapeHtml(state.settings.company_tagline || DEFAULT_COMPANY_TAGLINE)}</p>
+              <p>મોબાઇલ: ${escapeHtml(state.settings.company_phone || DEFAULT_COMPANY_PHONE)}</p>
+              <p>સરનામું: ${escapeHtml(state.settings.company_address || DEFAULT_COMPANY_ADDRESS)}</p>
             </div>
           </div>
           <div class="print-doc-badge">
@@ -2593,8 +2597,9 @@ async function printChallanById(challanId) {
             <img src="./logo.png" class="print-logo" alt="Gurukrupa Logo">
             <div class="print-title">
               <h1>${escapeHtml(state.settings.company_name || 'GURUKRUPA CREATION')}</h1>
-              <p>${escapeHtml(state.settings.company_tagline || 'Kurti - Pant Manufacturing & Jobwork Specialist')}</p>
-              <p>મોબાઇલ: ${escapeHtml(state.settings.company_phone || '')} • સરનામું: ${escapeHtml(state.settings.company_address || '')}</p>
+              <p>${escapeHtml(state.settings.company_tagline || DEFAULT_COMPANY_TAGLINE)}</p>
+              <p>મોબાઇલ: ${escapeHtml(state.settings.company_phone || DEFAULT_COMPANY_PHONE)}</p>
+              <p>સરનામું: ${escapeHtml(state.settings.company_address || DEFAULT_COMPANY_ADDRESS)}</p>
             </div>
           </div>
           <div class="print-doc-badge">
@@ -2687,11 +2692,11 @@ async function loadSettings() {
     const cn = document.getElementById('setCompanyName');
     if (cn) cn.value = s.company_name || 'GURUKRUPA CREATION';
     const ct = document.getElementById('setCompanyTagline');
-    if (ct) ct.value = s.company_tagline || '';
+    if (ct) ct.value = s.company_tagline || DEFAULT_COMPANY_TAGLINE;
     const cp = document.getElementById('setCompanyPhone');
-    if (cp) cp.value = s.company_phone || '';
+    if (cp) cp.value = s.company_phone || DEFAULT_COMPANY_PHONE;
     const ca = document.getElementById('setCompanyAddress');
-    if (ca) ca.value = s.company_address || '';
+    if (ca) ca.value = s.company_address || DEFAULT_COMPANY_ADDRESS;
     const cpr = document.getElementById('setChallanPrefix');
     if (cpr) cpr.value = s.challan_prefix || 'GK-CH-';
 
@@ -2884,7 +2889,9 @@ function downloadBackupPDF() {
   <div class="header">
     <div class="header-left">
       <h1>${companyName}</h1>
-      <p>Kurti - Pant Manufacturing &amp; Jobwork Specialist</p>
+      <p>${co.company_tagline || DEFAULT_COMPANY_TAGLINE}</p>
+      <p>મોબાઇલ: ${co.company_phone || DEFAULT_COMPANY_PHONE}</p>
+      <p>સરનામું: ${co.company_address || DEFAULT_COMPANY_ADDRESS}</p>
       <p>સંપૂર્ણ ડેટા બેકઅપ રિપોર્ટ</p>
     </div>
     <div class="header-right">
