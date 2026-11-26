@@ -921,6 +921,9 @@ function openModal(modalId) {
   const m = document.getElementById(modalId);
   if (m) {
     m.classList.add('active');
+    // Lock body scroll so only the modal scrolls on mobile
+    document.body.style.overflow = 'hidden';
+    document.body.style.touchAction = 'none';
     populateDropdowns();
     if (modalId === 'modal-add-challan') {
       initChallanModal();
@@ -931,6 +934,11 @@ function openModal(modalId) {
 function closeModal(modalId) {
   const m = document.getElementById(modalId);
   if (m) m.classList.remove('active');
+  // Restore body scroll only if no other modal is still open
+  if (!document.querySelector('.modal-overlay.active')) {
+    document.body.style.overflow = '';
+    document.body.style.touchAction = '';
+  }
 }
 
 // ===================================================================

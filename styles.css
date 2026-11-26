@@ -1235,6 +1235,9 @@ tbody tr:last-child td {
   align-items: center;
   justify-content: center;
   padding: 16px;
+  /* Allow the overlay itself to scroll on mobile so tall modals are reachable */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal-overlay.active {
@@ -1249,11 +1252,31 @@ tbody tr:last-child td {
   box-shadow: var(--shadow-lg), var(--top-highlight);
   width: 100%;
   max-width: 640px;
+  /* Allow the content box to scroll internally on larger screens */
   max-height: 90vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   animation: modalScaleUp 0.25s var(--ease-out);
+  /* Prevent the modal from shrinking below its natural height on mobile */
+  flex-shrink: 0;
+}
+
+/* On small screens: pin overlay to top, let the overlay scroll instead */
+@media (max-width: 640px) {
+  .modal-overlay {
+    align-items: flex-start;
+    padding: 12px 10px 24px;
+  }
+  .modal-content {
+    max-height: none;      /* Remove height cap so content isn't clipped */
+    overflow: visible;     /* Full content visible; overlay scroll handles it */
+    margin: auto 0;        /* Center vertically when content is short */
+  }
+  .modal-body {
+    overflow-y: visible;   /* Overlay scroll handles everything on mobile */
+    max-height: none;
+  }
 }
 
 @keyframes modalFadeIn {
