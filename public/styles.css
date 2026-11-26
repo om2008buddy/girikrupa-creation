@@ -605,6 +605,7 @@ body {
   flex-direction: column;
   gap: 8px;
   background: var(--bg-elev);
+  transition: padding var(--dur-base) var(--ease-out);
 }
 
 .sidebar-footer-row {
@@ -612,6 +613,46 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
+}
+
+.sidebar.collapsed .sidebar-footer {
+  padding: 12px 10px;
+  align-items: center;
+}
+
+.sidebar.collapsed .sidebar-footer-row {
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+}
+
+.sidebar.collapsed .sidebar-footer-row .footer-btn {
+  width: 42px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-footer > div:nth-child(2) {
+  justify-content: center !important;
+  width: 100%;
+  padding: 2px 0 !important;
+}
+
+.sidebar.collapsed .sidebar-footer button[onclick="toggleSidebarCollapse()"] {
+  width: 42px;
+  height: 32px;
+  padding: 0 !important;
+  justify-content: center;
+}
+
+.sidebar-footer button[onclick="toggleSidebarCollapse()"] svg {
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.sidebar.collapsed .sidebar-footer button[onclick="toggleSidebarCollapse()"] svg {
+  transform: rotate(180deg);
 }
 
 .sidebar-watermark {
