@@ -1532,8 +1532,9 @@ async function loadFixKarigar() {
           <td class="num"><strong style="color:var(--success);">₹${meta.salary.toLocaleString('en-IN')}</strong></td>
           <td>${escapeHtml(k.address || '-')}</td>
           <td class="num"><strong style="color:var(--danger);">₹${totalU.toLocaleString('en-IN')}</strong></td>
-          <td>
+          <td style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="btn btn-sm btn-outline" onclick="switchTab('karigars'); setTimeout(() => selectAndShowLedger(${k.id}), 250);">ખાતાવહી</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteKarigar(${k.id}, '${escapeHtml(k.name).replace(/'/g, "\\'")}')">કાઢી નાખો</button>
           </td>
         </tr>
       `;
@@ -1577,8 +1578,9 @@ async function loadChhutakKarigar() {
           <td class="num"><strong style="color:var(--info);">₹${totalW.toLocaleString('en-IN')}</strong></td>
           <td class="num"><strong style="color:var(--danger);">₹${totalU.toLocaleString('en-IN')}</strong></td>
           <td class="num"><strong style="color:${bal >= 0 ? 'var(--success)' : 'var(--danger)'};">₹${bal.toLocaleString('en-IN')}</strong></td>
-          <td>
+          <td style="display:flex; gap:6px; flex-wrap:wrap;">
             <button class="btn btn-sm btn-outline" onclick="switchTab('karigars'); setTimeout(() => selectAndShowLedger(${k.id}), 250);">ખાતાવહી</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteKarigar(${k.id}, '${escapeHtml(k.name).replace(/'/g, "\\'")}')">કાઢી નાખો</button>
           </td>
         </tr>
       `;
@@ -1605,12 +1607,28 @@ function renderKarigarsListTable(karigars) {
         <small style="color:var(--text-muted); display:block; margin-top:2px;">${escapeHtml(meta.cleanSpeciality)}</small>
       </td>
       <td>${escapeHtml(k.address || '-')}</td>
-      <td>
+      <td style="display:flex; gap:6px; flex-wrap:wrap;">
         <button class="btn btn-sm btn-outline" onclick="selectAndShowLedger(${k.id})">ખાતાવહી જુઓ</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteKarigar(${k.id}, '${escapeHtml(k.name).replace(/'/g, "\\'")}')">કાઢી નાખો</button>
       </td>
     </tr>
   `;
   }).join('');
+}
+
+async function deleteKarigar(id, name) {
+  if (!confirm(`શું તમે "${name || 'આ કારીગર'}" ને કાઢી નાખવા માંગો છો?\n(તેમના કામ અને ઉપાડની એન્ટ્રી પણ દૂર થશે)`)) return;
+  try {
+    await api(`/api/karigars/${id}`, { method: 'DELETE' });
+    showToast('કારીગર સફળતાપૂર્વક દૂર કરવામાં આવ્યા!', 'info');
+    await fetchDropdownMasters();
+    if (currentTab === 'fix-karigar') loadFixKarigar();
+    else if (currentTab === 'chhutak-karigar') loadChhutakKarigar();
+    else loadKarigars();
+    loadDashboard();
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
 }
 
 function renderKarigarWorkTable(work) {
