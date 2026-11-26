@@ -2432,7 +2432,6 @@ function addChallanItemRow(defaultData = {}) {
   const div = document.createElement('div');
   div.className = 'challan-item-row';
   div.id = rowId;
-  div.style.cssText = 'display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr 1.2fr 40px; gap: 8px; align-items: center; background: #fff; padding: 6px; border: 1px solid var(--slate-200); border-radius: var(--radius-sm);';
 
   div.innerHTML = `
     <div>
