@@ -7,7 +7,7 @@ const SUPABASE_URL = 'https://vlzcckwtufnqfqdwblgk.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_J7FK-c4VtzqWUGAImyj6_w_e9G4GQwd';
 
 let currentPin = '';
-let authToken = localStorage.getItem('gk_auth_token') || '';
+let authToken = '';
 let currentTab = 'dashboard';
 let currentDashboardFilter = 'all';
 
@@ -120,21 +120,44 @@ function updatePinDots() {
 async function verifyPasscode() {
   if (currentPin === APP_PASSCODE) {
     authToken = 'gk_authenticated_session';
-    localStorage.setItem('gk_auth_token', authToken);
-    
-    // Success feedback
+
+    // Success feedback on PIN dots
     const pinDots = document.getElementById('pinDots');
     if (pinDots) pinDots.classList.add('success');
-    
+
+    if (navigator.vibrate) {
+      navigator.vibrate([30, 20, 50]);
+    }
+
     const lockScreen = document.getElementById('lockScreen');
-    if (lockScreen) lockScreen.classList.add('unlocking');
+    const appRoot = document.getElementById('appRoot');
+
+    // Reveal appRoot underneath lockScreen and apply smooth dashboard entrance
+    if (appRoot) {
+      appRoot.style.display = 'flex';
+      appRoot.classList.add('dashboard-unlock-reveal');
+    }
+
+    // Trigger subtle vault iris zoom & fade transition on lockScreen
+    if (lockScreen) {
+      lockScreen.classList.add('unlocking');
+    }
+
+    // Initialize dashboard data
+    initApp();
 
     setTimeout(() => {
-      unlockApp();
+      if (lockScreen) {
+        lockScreen.style.display = 'none';
+        lockScreen.classList.remove('unlocking');
+      }
       if (pinDots) pinDots.classList.remove('success');
-      if (lockScreen) lockScreen.classList.remove('unlocking');
+      clearPin();
+      setTimeout(() => {
+        if (appRoot) appRoot.classList.remove('dashboard-unlock-reveal');
+      }, 700);
       showToast('સફળ પ્રવેશ! સ્વાગત છે.', 'success');
-    }, 350);
+    }, 550);
   } else {
     handlePinError();
   }
@@ -168,8 +191,23 @@ function lockApp() {
   localStorage.removeItem('gk_auth_token');
   authToken = '';
   clearPin();
-  document.getElementById('appRoot').style.display = 'none';
-  document.getElementById('lockScreen').style.display = 'flex';
+  const appRoot = document.getElementById('appRoot');
+  const lockScreen = document.getElementById('lockScreen');
+  if (appRoot) {
+    appRoot.style.display = 'none';
+    appRoot.classList.remove('dashboard-unlock-reveal');
+  }
+  if (lockScreen) {
+    lockScreen.style.display = 'flex';
+    lockScreen.classList.remove('unlocking');
+    // Re-trigger entrance animation on lockCard
+    const lockCard = document.getElementById('lockCard');
+    if (lockCard) {
+      lockCard.style.animation = 'none';
+      void lockCard.offsetHeight;
+      lockCard.style.animation = '';
+    }
+  }
 }
 
 // Support keyboard entry for passcode
@@ -203,11 +241,8 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }, { passive: true });
 
-  if (authToken) {
-    unlockApp();
-  } else {
-    document.getElementById('lockScreen').style.display = 'flex';
-  }
+  // Always require passcode on every page load / refresh
+  lockApp();
 });
 
 // ===================================================================
