@@ -796,7 +796,9 @@ const viewTitles = {
   dashboard: { title: 'નફો-નુકસાન અને ડેશબોર્ડ', sub: 'સમગ્ર કારખાનાનો હિસાબ અને વાસ્તવિક ચોખ્ખો નફો' },
   lots: { title: 'વેપારી આવેલ માલ (Inward Lots)', sub: 'વેપારીઓ પાસેથી મળેલ કાપડ/ઓર્ડર અને ભાવ હિસાબ' },
   challans: { title: 'વેપારી માલ ચલણ (Delivery Challan)', sub: 'તૈયાર માલ જમા કરવા માટે ચલણ અને ઓટો પ્રિન્ટ' },
-  karigars: { title: 'કારીગર કામ & ઉપાડ હિસાબ', sub: 'કુર્તી-પેન્ટ સિલાઈ પીસ, ઉપાડ અને પગાર રસીદ' },
+  karigars: { title: 'કારીગર કામ & ઉપાડ હિસાબ', sub: 'કુર્તી-પેન્ટ સિલાઈ પીસ, ઉપાડ અને પગાર રસીદ — બધા કારીગર' },
+  'fix-karigar': { title: 'ફિક્સ પગાર કારીગર', sub: 'માસિક નિશ્ચિત પગાર વાળા કારીગરની યાદી અને ઉપાડ' },
+  'chhutak-karigar': { title: 'છૂટક કામ વાળા કારીગર', sub: 'પીસ-ભાવ / છૂટક ધોરણે કામ કરનારા કારીગર' },
   designs: { title: 'ડિઝાઇન કેટલોગ (Design Master)', sub: 'ડિઝાઇન મુજબ વેપારી ભાવ, સિલાઈ ભાવ અને પ્રેસ ભાવ' },
   press: { title: 'પ્રેસ હિસાબ (Ironing Work)', sub: 'પ્રેસ વાળાના પીસ અને બિલ હિસાબ' },
   materials: { title: 'મટીરીયલ્સ / કાચો માલ ખર્ચ', sub: 'દોરો, બટન, ઝિપ, ઇલાસ્ટિક, પેકિંગ બેગ વગેરે' },
@@ -843,6 +845,8 @@ function switchTab(tabId) {
   else if (tabId === 'lots') loadLots();
   else if (tabId === 'challans') loadChallans();
   else if (tabId === 'karigars') loadKarigars();
+  else if (tabId === 'fix-karigar') loadFixKarigar();
+  else if (tabId === 'chhutak-karigar') loadChhutakKarigar();
   else if (tabId === 'designs') loadDesigns();
   else if (tabId === 'press') loadPress();
   else if (tabId === 'materials') loadMaterials();
@@ -1364,6 +1368,7 @@ async function loadKarigars() {
     state.karigarUpad = upad;
 
     renderKarigarsListTable(karigars);
+    renderAllKarigarSummaryTable(karigars, work, upad);
     renderKarigarWorkTable(work);
     renderKarigarUpadTable(upad);
 
@@ -1376,23 +1381,198 @@ async function loadKarigars() {
   }
 }
 
+function parseKarigarMeta(k) {
+  const rawSpec = k?.speciality || 'સિલાઈ';
+  const match = rawSpec.match(/\[ફિક્સ:(\d+(?:\.\d+)?)\]/);
+  if (match || k?.karigar_type === 'fix_pagar') {
+    const salary = match ? Number(match[1]) : (Number(k?.monthly_salary) || 0);
+    const cleanSpeciality = rawSpec.replace(/\s*\[ફિક્સ:\d+(?:\.\d+)?\]/, '').trim() || 'સિલાઈ';
+    return { isFix: true, salary, cleanSpeciality };
+  }
+  return { isFix: false, salary: 0, cleanSpeciality: rawSpec };
+}
+
+function toggleFixSalaryField(val) {
+  const grp = document.getElementById('fixSalaryGroup');
+  if (grp) grp.style.display = val === 'fix_pagar' ? 'block' : 'none';
+}
+
+function openAddKarigarWithType(type) {
+  openModal('modal-add-karigar');
+  const sel = document.getElementById('karigarType');
+  if (sel) {
+    sel.value = type;
+    toggleFixSalaryField(type);
+  }
+}
+
+function closeKarigarDetail() {
+  const panel = document.getElementById('karigarDetailPanel');
+  if (panel) panel.style.display = 'none';
+}
+
+function renderAllKarigarSummaryTable(karigars, work, upad) {
+  const tbody = document.querySelector('#allKarigarSummaryTable tbody');
+  if (!tbody) return;
+  if (!karigars || karigars.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">કોઈ કારીગર ઉમેરેલ નથી.</td></tr>`;
+    return;
+  }
+
+  let grandWork = 0;
+  let grandUpad = 0;
+  let grandBal = 0;
+
+  const rowsHtml = karigars.map(k => {
+    const meta = parseKarigarMeta(k);
+    const totalW = (work || []).filter(w => w.karigar_id == k.id).reduce((s, w) => s + (Number(w.total_amount) || 0), 0);
+    const totalU = (upad || []).filter(u => u.karigar_id == k.id).reduce((s, u) => s + (Number(u.amount) || 0), 0);
+    const baseEarned = meta.isFix && totalW === 0 ? meta.salary : totalW;
+    const bal = baseEarned - totalU;
+
+    grandWork += baseEarned;
+    grandUpad += totalU;
+    grandBal += bal;
+
+    const typeBadge = meta.isFix
+      ? `<span class="badge badge-info">ફિક્સ પગાર${meta.salary ? ` (₹${meta.salary.toLocaleString('en-IN')})` : ''}</span>`
+      : `<span class="badge badge-success">છૂટક (${escapeHtml(meta.cleanSpeciality)})</span>`;
+
+    return `
+      <tr>
+        <td><strong>${escapeHtml(k.name)}</strong></td>
+        <td>${typeBadge}</td>
+        <td class="num"><strong style="color:var(--info);">₹${baseEarned.toLocaleString('en-IN')}</strong></td>
+        <td class="num"><strong style="color:var(--danger);">₹${totalU.toLocaleString('en-IN')}</strong></td>
+        <td class="num"><strong style="color:${bal >= 0 ? 'var(--success)' : 'var(--danger)'};">₹${bal.toLocaleString('en-IN')}</strong></td>
+        <td>
+          <button class="btn btn-sm btn-outline" onclick="selectAndShowLedger(${k.id})">વિગત / રસીદ</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  const totalRow = `
+    <tr style="background: var(--surface-2); font-weight: 700; border-top: 2px solid var(--border-strong);">
+      <td colspan="2">કુલ સરવાળો (${karigars.length} કારીગર)</td>
+      <td class="num" style="color:var(--info);">₹${grandWork.toLocaleString('en-IN')}</td>
+      <td class="num" style="color:var(--danger);">₹${grandUpad.toLocaleString('en-IN')}</td>
+      <td class="num" style="color:var(--accent);">₹${grandBal.toLocaleString('en-IN')}</td>
+      <td></td>
+    </tr>
+  `;
+
+  tbody.innerHTML = rowsHtml + totalRow;
+}
+
+async function loadFixKarigar() {
+  try {
+    const [karigars, upad] = await Promise.all([
+      api('/api/karigars'),
+      api('/api/karigar-upad'),
+    ]);
+    state.karigars = karigars;
+    state.karigarUpad = upad;
+
+    const fixList = karigars.filter(k => parseKarigarMeta(k).isFix);
+    const tbody = document.querySelector('#fixKarigarTable tbody');
+    if (!tbody) return;
+
+    if (fixList.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">કોઈ ફિક્સ પગાર કારીગર ઉમેરેલ નથી. ઉપર "+ ફિક્સ કારીગર ઉમેરો" બટન પર ક્લિક કરો.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = fixList.map((k, idx) => {
+      const meta = parseKarigarMeta(k);
+      const totalU = upad.filter(u => u.karigar_id == k.id).reduce((s, u) => s + (Number(u.amount) || 0), 0);
+      return `
+        <tr>
+          <td>${idx + 1}</td>
+          <td><strong>${escapeHtml(k.name)}</strong><br><small style="color:var(--text-muted);">${escapeHtml(meta.cleanSpeciality)}</small></td>
+          <td>${escapeHtml(k.phone || '-')}</td>
+          <td class="num"><strong style="color:var(--success);">₹${meta.salary.toLocaleString('en-IN')}</strong></td>
+          <td>${escapeHtml(k.address || '-')}</td>
+          <td class="num"><strong style="color:var(--danger);">₹${totalU.toLocaleString('en-IN')}</strong></td>
+          <td>
+            <button class="btn btn-sm btn-outline" onclick="switchTab('karigars'); setTimeout(() => selectAndShowLedger(${k.id}), 250);">ખાતાવહી</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
+async function loadChhutakKarigar() {
+  try {
+    const [karigars, work, upad] = await Promise.all([
+      api('/api/karigars'),
+      api('/api/karigar-work'),
+      api('/api/karigar-upad'),
+    ]);
+    state.karigars = karigars;
+    state.karigarWork = work;
+    state.karigarUpad = upad;
+
+    const chhutakList = karigars.filter(k => !parseKarigarMeta(k).isFix);
+    const tbody = document.querySelector('#chhutakKarigarTable tbody');
+    if (!tbody) return;
+
+    if (chhutakList.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-muted);">કોઈ છૂટક કામ વાળા કારીગર નથી.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = chhutakList.map((k, idx) => {
+      const meta = parseKarigarMeta(k);
+      const totalW = work.filter(w => w.karigar_id == k.id).reduce((s, w) => s + (Number(w.total_amount) || 0), 0);
+      const totalU = upad.filter(u => u.karigar_id == k.id).reduce((s, u) => s + (Number(u.amount) || 0), 0);
+      const bal = totalW - totalU;
+      return `
+        <tr>
+          <td>${idx + 1}</td>
+          <td><strong>${escapeHtml(k.name)}</strong><br><small style="color:var(--text-muted);">${escapeHtml(meta.cleanSpeciality)}</small></td>
+          <td>${escapeHtml(k.phone || '-')}</td>
+          <td>${escapeHtml(k.address || '-')}</td>
+          <td class="num"><strong style="color:var(--info);">₹${totalW.toLocaleString('en-IN')}</strong></td>
+          <td class="num"><strong style="color:var(--danger);">₹${totalU.toLocaleString('en-IN')}</strong></td>
+          <td class="num"><strong style="color:${bal >= 0 ? 'var(--success)' : 'var(--danger)'};">₹${bal.toLocaleString('en-IN')}</strong></td>
+          <td>
+            <button class="btn btn-sm btn-outline" onclick="switchTab('karigars'); setTimeout(() => selectAndShowLedger(${k.id}), 250);">ખાતાવહી</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch (err) {
+    showToast(err.message, 'error');
+  }
+}
+
 function renderKarigarsListTable(karigars) {
   const tbody = document.querySelector('#karigarsListTable tbody');
   if (!karigars || karigars.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:var(--slate-400);">કોઈ કારીગર ઉમેરેલ નથી.</td></tr>`;
     return;
   }
-  tbody.innerHTML = karigars.map(k => `
+  tbody.innerHTML = karigars.map(k => {
+    const meta = parseKarigarMeta(k);
+    return `
     <tr>
       <td><strong>${escapeHtml(k.name)}</strong></td>
       <td>${escapeHtml(k.phone || '-')}</td>
-      <td><span class="badge badge-info">${escapeHtml(k.speciality || 'સિલાઈ')}</span></td>
+      <td>
+        <span class="badge ${meta.isFix ? 'badge-info' : 'badge-success'}">${meta.isFix ? `ફિક્સ પગાર (₹${meta.salary.toLocaleString('en-IN')})` : 'છૂટક કામ'}</span>
+        <small style="color:var(--text-muted); display:block; margin-top:2px;">${escapeHtml(meta.cleanSpeciality)}</small>
+      </td>
       <td>${escapeHtml(k.address || '-')}</td>
       <td>
         <button class="btn btn-sm btn-outline" onclick="selectAndShowLedger(${k.id})">ખાતાવહી જુઓ</button>
       </td>
     </tr>
-  `).join('');
+  `;
+  }).join('');
 }
 
 function renderKarigarWorkTable(work) {
@@ -1495,8 +1675,17 @@ async function loadKarigarLedger(karigarId) {
 
 function selectAndShowLedger(karigarId) {
   switchKarigarSubTab('ledger');
-  document.getElementById('ledgerKarigarSelect').value = karigarId;
+  const panel = document.getElementById('karigarDetailPanel');
+  if (panel) {
+    panel.style.display = 'block';
+    const k = (state.karigars || []).find(item => item.id == karigarId);
+    const titleEl = document.getElementById('ledgerDetailTitle');
+    if (titleEl && k) titleEl.textContent = `${k.name} — કામ & ઉપાડ સ્ટેટમેન્ટ`;
+  }
+  const sel = document.getElementById('ledgerKarigarSelect');
+  if (sel) sel.value = karigarId;
   loadKarigarLedger(karigarId);
+  if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function onWorkDesignChange(designId) {
@@ -1567,18 +1756,27 @@ async function submitKarigarUpad(e) {
 
 async function submitKarigar(e) {
   e.preventDefault();
+  const type = document.getElementById('karigarType')?.value || 'chhutak';
+  const salary = Number(document.getElementById('karigarMonthlySalary')?.value) || 0;
+  const baseSpec = document.getElementById('karigarSpeciality').value;
+  const speciality = type === 'fix_pagar' ? `${baseSpec} [ફિક્સ:${salary}]` : baseSpec;
+
   const payload = {
     name: document.getElementById('karigarName').value,
     phone: document.getElementById('karigarPhone').value,
-    speciality: document.getElementById('karigarSpeciality').value,
+    speciality,
     address: document.getElementById('karigarAddress').value,
   };
   try {
     await api('/api/karigars', { method: 'POST', body: JSON.stringify(payload) });
     closeModal('modal-add-karigar');
     showToast('કારીગર સફળતાપૂર્વક ઉમેરાયા!', 'success');
+    e.target.reset();
+    toggleFixSalaryField('chhutak');
     await fetchDropdownMasters();
-    loadKarigars();
+    if (currentTab === 'fix-karigar') loadFixKarigar();
+    else if (currentTab === 'chhutak-karigar') loadChhutakKarigar();
+    else loadKarigars();
   } catch (err) {
     showToast(err.message, 'error');
   }

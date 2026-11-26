@@ -114,7 +114,15 @@
         <div class="nav-section-title">કારીગર & ઉત્પાદન</div>
         <a class="nav-item" onclick="switchTab('karigars')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-          <span class="nav-item-text">કારીગર કામ & ઉપાડ</span>
+          <span class="nav-item-text">કારીગર કામ &amp; ઉપાડ</span>
+        </a>
+        <a class="nav-item" onclick="switchTab('fix-karigar')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          <span class="nav-item-text">ફિક્સ પગાર કારીગર</span>
+        </a>
+        <a class="nav-item" onclick="switchTab('chhutak-karigar')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span class="nav-item-text">છૂટક કામ વાળા કારીગર</span>
         </a>
         <a class="nav-item" onclick="switchTab('designs')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
@@ -413,43 +421,22 @@
 
           <!-- Subtab 1: Ledger & Salary Slip -->
           <div id="karigar-sub-ledger">
+            <!-- All Karigars Summary -->
             <div class="premium-card" style="margin-bottom: 20px;">
-              <div class="card-body">
-                <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                  <div class="form-group" style="min-width: 250px;">
-                    <label>કારીગર પસંદ કરો:</label>
-                    <select id="ledgerKarigarSelect" class="form-control" onchange="loadKarigarLedger(this.value)">
-                      <option value="">-- કારીગર સિલેક્ટ કરો --</option>
-                    </select>
-                  </div>
-                  <div id="karigarLedgerSummary" style="display: none; align-items: center; gap: 20px; margin-top: 18px; flex-wrap: wrap;">
-                    <div>કુલ કામ: <strong id="ledTotalWork" style="color: var(--sapphire-600); font-size: 16px;">₹0</strong></div>
-                    <div>કુલ ઉપાડ: <strong id="ledTotalUpad" style="color: var(--rose-600); font-size: 16px;">₹0</strong></div>
-                    <div>બાકી ચૂકવવાના: <strong id="ledNetBalance" style="color: var(--emerald-600); font-size: 18px;">₹0</strong></div>
-                    <button class="btn btn-success btn-sm" onclick="printKarigarSalarySlip()">
-                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-                      કારીગર પગાર રસીદ પ્રિન્ટ કરો
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="premium-card">
               <div class="card-header">
-                <h3>કારીગર કામ & ઉપાડ સ્ટેટમેન્ટ</h3>
+                <h3>&#x2728; તમામ કારીગર — ઓવરઓલ હિસાબ</h3>
               </div>
               <div class="card-body" style="padding: 0;">
                 <div class="table-container" style="border: none;">
-                  <table id="karigarLedgerTable">
+                  <table id="allKarigarSummaryTable">
                     <thead>
                       <tr>
-                        <th>તારીખ</th>
+                        <th>કારીગર નામ</th>
                         <th>પ્રકાર</th>
-                        <th>ડિઝાઇન / નોંધ</th>
-                        <th>કુર્તી પીસ</th>
-                        <th>પેન્ટ પીસ</th>
-                        <th>રકમ (₹)</th>
+                        <th>કુલ કામ (&#x20B9;)</th>
+                        <th>કુલ ઉપાડ (&#x20B9;)</th>
+                        <th>બાકી ચૂકવવાના (&#x20B9;)</th>
+                        <th>એક્શન</th>
                       </tr>
                     </thead>
                     <tbody></tbody>
@@ -457,9 +444,52 @@
                 </div>
               </div>
             </div>
-          </div>
-
-          <!-- Subtab 2: Work Log -->
+            <!-- Individual Karigar Detail Panel (shown when View clicked) -->
+            <div id="karigarDetailPanel" style="display:none;">
+              <div class="premium-card" style="margin-bottom: 14px;">
+                <div class="card-body" style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                  <div class="form-group" style="min-width: 220px;">
+                    <label>કારીગર પસંદ કરો:</label>
+                    <select id="ledgerKarigarSelect" class="form-control" onchange="loadKarigarLedger(this.value)">
+                      <option value="">-- કારીગર સિલેક્ટ કરો --</option>
+                    </select>
+                  </div>
+                  <div id="karigarLedgerSummary" style="display: none; align-items: center; gap: 20px; margin-top: 18px; flex-wrap: wrap;">
+                    <div>કુલ કામ: <strong id="ledTotalWork" style="color: var(--success); font-size: 16px;">&#x20B9;0</strong></div>
+                    <div>કુલ ઉપાડ: <strong id="ledTotalUpad" style="color: var(--danger); font-size: 16px;">&#x20B9;0</strong></div>
+                    <div>બાકી ચૂકવવાના: <strong id="ledNetBalance" style="color: var(--accent); font-size: 18px;">&#x20B9;0</strong></div>
+                    <button class="btn btn-success btn-sm" onclick="printKarigarSalarySlip()">
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                      પગાર રસીદ પ્રિન્ટ
+                    </button>
+                    <button class="btn btn-outline btn-sm" onclick="closeKarigarDetail()">&#8592; બધા જુઓ</button>
+                  </div>
+                </div>
+              </div>
+              <div class="premium-card">
+                <div class="card-header">
+                  <h3 id="ledgerDetailTitle">કારીગર વિગત</h3>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                  <div class="table-container" style="border: none;">
+                    <table id="karigarLedgerTable">
+                      <thead>
+                        <tr>
+                          <th>તારીખ</th>
+                          <th>પ્રકાર</th>
+                          <th>ડિઝાઇન / નોંધ</th>
+                          <th>કુર્તી પીસ</th>
+                          <th>પેન્ટ પીસ</th>
+                          <th>રકમ (&#x20B9;)</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+                    <!-- Subtab 2: Work Log -->
           <div id="karigar-sub-work" style="display: none;">
             <div class="premium-card">
               <div class="card-body" style="padding: 0;">
@@ -532,6 +562,69 @@
             </div>
           </div>
 
+        </section>
+
+        <!-- ==========================================
+             VIEW: FIX PAGAR KARIGAR (ફિક્સ પગાર કારીગર)
+             ========================================== -->
+        <section id="view-fix-karigar" class="tab-view" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+            <p style="font-size: 13px; color: var(--text-muted);">ફિક્સ માસિક પગાર વાળા કારીગર — &#x20B9; / month</p>
+            <button class="btn btn-primary btn-sm" onclick="openAddKarigarWithType('fix_pagar')">+ ફિક્સ કારીગર ઉમેરો</button>
+          </div>
+          <div class="premium-card">
+            <div class="card-header"><h3>ફિક્સ પગાર કારીગર યાદી</h3></div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-container" style="border: none;">
+                <table id="fixKarigarTable">
+                  <thead>
+                    <tr>
+                      <th>&#x2116;</th>
+                      <th>કારીગર નામ</th>
+                      <th>મોબાઇલ</th>
+                      <th>માસિક પગાર (&#x20B9;)</th>
+                      <th>સરનામું</th>
+                      <th>કુલ ઉપાડ (&#x20B9;)</th>
+                      <th>એક્શન</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==========================================
+             VIEW: CHHUTAK KARIGAR (છૂટક કામ વાળા કારીગર)
+             ========================================== -->
+        <section id="view-chhutak-karigar" class="tab-view" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+            <p style="font-size: 13px; color: var(--text-muted);">પીસ-ભાવ / છૂટક ધોરણે કામ કરનારા કારીગર</p>
+            <button class="btn btn-primary btn-sm" onclick="openAddKarigarWithType('chhutak')">+ છૂટક કારીગર ઉમેરો</button>
+          </div>
+          <div class="premium-card">
+            <div class="card-header"><h3>છૂટક કામ વાળા કારીગર યાદી</h3></div>
+            <div class="card-body" style="padding: 0;">
+              <div class="table-container" style="border: none;">
+                <table id="chhutakKarigarTable">
+                  <thead>
+                    <tr>
+                      <th>&#x2116;</th>
+                      <th>કારીગર નામ</th>
+                      <th>મોબાઇલ</th>
+                      <th>સરનામું</th>
+                      <th>કુલ કામ (&#x20B9;)</th>
+                      <th>કુલ ઉપાડ (&#x20B9;)</th>
+                      <th>બાકી (&#x20B9;)</th>
+                      <th>એક્શન</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         </section>
 
         <!-- ==========================================
@@ -1105,6 +1198,19 @@
                 <option value="પેકિંગ">પેકિંગ</option>
               </select>
             </div>
+          </div>
+          <!-- Karigar Salary Type -->
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label>પગાર પ્રકાર (Salary Type):</label>
+            <select id="karigarType" class="form-control" onchange="toggleFixSalaryField(this.value)">
+              <option value="chhutak">છૂટક કામ (Piece Rate)</option>
+              <option value="fix_pagar">ફિક્સ પગાર (Fixed Salary)</option>
+            </select>
+          </div>
+          <!-- Monthly salary — shown only for fix_pagar -->
+          <div class="form-group" id="fixSalaryGroup" style="display:none; margin-bottom: 14px;">
+            <label>માસિક પગાર (₹):</label>
+            <input type="number" id="karigarMonthlySalary" class="form-control" placeholder="દા.ત. 8000">
           </div>
           <div class="form-group">
             <label>સરનામું:</label>
