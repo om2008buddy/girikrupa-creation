@@ -1863,3 +1863,71 @@ tbody tr:last-child td {
     font-weight: 600;
   }
 }
+
+/* ===================================================
+   PROFIT SECTION TOGGLE — Premium Slide Animation
+   =================================================== */
+.profit-toggle-wrap {
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.profit-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border-radius: 50px;
+  border: 1.5px solid var(--accent, #2d6a4f);
+  background: transparent;
+  color: var(--accent, #2d6a4f);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: background 0.22s ease, color 0.22s ease, box-shadow 0.22s ease, transform 0.15s ease;
+  box-shadow: 0 1px 6px rgba(45, 106, 79, 0.08);
+}
+
+.profit-toggle-btn:hover {
+  background: var(--accent, #2d6a4f);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(45, 106, 79, 0.22);
+  transform: translateY(-1px);
+}
+
+.profit-toggle-btn:active {
+  transform: translateY(0px);
+}
+
+.profit-toggle-btn.active {
+  background: var(--accent, #2d6a4f);
+  color: #fff;
+}
+
+/* Hidden state (default) */
+.profit-section-hidden {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-10px);
+  pointer-events: none;
+  transition:
+    max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity    0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    transform  0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Visible state */
+.profit-section-visible {
+  max-height: 700px;
+  opacity: 1;
+  overflow: hidden;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition:
+    max-height 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity    0.4s 0.05s cubic-bezier(0.16, 1, 0.3, 1),
+    transform  0.4s 0.05s cubic-bezier(0.16, 1, 0.3, 1);
+}
