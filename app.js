@@ -1893,52 +1893,34 @@ async function printKarigarSalarySlip() {
           </div>
         </div>
 
-        <div style="margin-bottom: 16px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd;">
+        <div style="margin-bottom: 16px; padding: 12px; background: #f9f9f9; border: 1px solid #000; border-radius: 4px;">
           <p><strong>કારીગર નામ:</strong> ${escapeHtml(karigar.name)}</p>
-          <p><strong>કામનો પ્રકાર:</strong> ${escapeHtml(karigar.speciality || 'સિલાઈ')}</p>
+          <p><strong>કામનો પ્રકાર:</strong> ${escapeHtml(parseKarigarMeta(karigar).cleanSpeciality)}</p>
           <p><strong>મોબાઇલ:</strong> ${escapeHtml(karigar.phone || '-')}</p>
         </div>
 
-        <h4 style="margin-top: 14px; margin-bottom: 6px;">સિલાઈ કામ વિગત:</h4>
-        <table class="print-table">
+        <table class="print-table" style="margin-top: 18px;">
           <thead>
             <tr>
-              <th>તારીખ</th>
-              <th>ડિઝાઇન નંબર</th>
-              <th>કુર્તી પીસ × ભાવ</th>
-              <th>પેન્ટ પીસ × ભાવ</th>
-              <th>રકમ (₹)</th>
+              <th style="text-align: left;">હિસાબની વિગત (Summary)</th>
+              <th style="text-align: right; width: 180px;">રકમ (₹)</th>
             </tr>
           </thead>
           <tbody>
-            ${data.workEntries.map(w => `
-              <tr>
-                <td>${formatDate(w.date)}</td>
-                <td>${escapeHtml(w.design_no || '-')}</td>
-                <td>${w.kurti_pieces} @ ₹${w.kurti_rate}</td>
-                <td>${w.pant_pieces} @ ₹${w.pant_rate}</td>
-                <td>₹${w.total_amount.toLocaleString('en-IN')}</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-
-        <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
-          <table style="width: 320px; border-collapse: collapse;">
             <tr>
-              <td style="padding: 6px; border: 1px solid #000;">કુલ સિલાઈ કામ (+):</td>
-              <td style="padding: 6px; border: 1px solid #000; text-align: right; font-weight: bold;">₹${summary.totalEarned.toLocaleString('en-IN')}</td>
+              <td><strong>અત્યાર સુધીનું કુલ કામ (Total Work Done):</strong></td>
+              <td style="text-align: right; font-weight: 700; font-size: 14px;">₹${summary.totalEarned.toLocaleString('en-IN')}</td>
             </tr>
             <tr>
-              <td style="padding: 6px; border: 1px solid #000; color: #c00;">કુલ ઉપાડ કપાત (-):</td>
-              <td style="padding: 6px; border: 1px solid #000; text-align: right; font-weight: bold; color: #c00;">₹${summary.totalUpad.toLocaleString('en-IN')}</td>
+              <td style="color: #c00;"><strong>કુલ ઉપાડ કપાત (Total Upad / Advance):</strong></td>
+              <td style="text-align: right; font-weight: 700; font-size: 14px; color: #c00;">- ₹${summary.totalUpad.toLocaleString('en-IN')}</td>
             </tr>
             <tr style="background: #f0f0f0;">
-              <td style="padding: 8px; border: 2px solid #000; font-size: 14px; font-weight: bold;">ચોખ્ખી ચૂકવવાપાત્ર રકમ:</td>
-              <td style="padding: 8px; border: 2px solid #000; text-align: right; font-size: 15px; font-weight: bold;">₹${summary.netBalance.toLocaleString('en-IN')}</td>
+              <td style="font-size: 15px; font-weight: 800; border-top: 2px solid #000;">બાકી ચૂકવવાપાત્ર રકમ (Net Balance Left):</td>
+              <td style="text-align: right; font-size: 16px; font-weight: 800; border-top: 2px solid #000;">₹${summary.netBalance.toLocaleString('en-IN')}</td>
             </tr>
-          </table>
-        </div>
+          </tbody>
+        </table>
 
         <div class="print-signatures">
           <div class="signature-box">
